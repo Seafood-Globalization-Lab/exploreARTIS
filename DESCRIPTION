@@ -1,11 +1,16 @@
 Package: exploreARTIS
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Analyze and Visualize ARTIS data
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
+Author: Rahul Agrawal Bejarano, Kelvin Gorospe, Jessica Gephart
+Maintainer: The package maintainer <jgephart@american.edu>
+Description: Functions to explore, summarize and visualize ARTIS data.
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: CC0 1.0 Universal
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    dplyr
+    countrycode
+    viridis
+RoxygenNote: 7.1.2
