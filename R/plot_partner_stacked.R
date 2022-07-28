@@ -3,7 +3,7 @@
 #' @import viridis
 #' @export
 
-plot_partner_stacked <- function(data, trade_flow, prop_flow_cutoff = 0.05, 
+plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff = 0.05, 
                               species = NA, years = NA,
                               producers = NA, exporters = NA, importers = NA,
                               hs_codes = NA, prod_method = NA, prod_environment = NA,
@@ -91,6 +91,6 @@ plot_partner_stacked <- function(data, trade_flow, prop_flow_cutoff = 0.05,
       ggplot() +
       geom_area(aes(x = year, y = quantity, fill = partner.name)) +
       scale_fill_viridis_d() +
-      labs(y = "Quantity (tonnes)", x = "Year", title = plot.title, fill = partner.lab) +
+      labs(y = quantity.lab, x = "Year", title = plot.title, fill = partner.lab) +
       theme_bw() 
 }

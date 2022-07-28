@@ -64,3 +64,20 @@ plot_partner_stacked(artis, trade_flow = "export", prod_method = "capture", prod
 plot_partner_stacked(artis, trade_flow = "import", export_source = "foreign export")
 plot_partner_stacked(artis, trade_flow = "export", export_source = "foreign export")
 
+# Test plot_partner_line function
+plot_partner_line(artis, trade_flow = "import")
+plot_partner_line(artis, trade_flow = "export")
+
+plot_partner_line(artis, trade_flow = "import", weight = "live")
+plot_partner_line(artis, trade_flow = "import", weight = "product")
+
+# Test plot_species_stacked function
+plot_species_stacked(artis)
+
+plot_species_stacked(artis, species = c("salmo salar", "thunnus albacares"))
+
+plot_species_stacked(artis, years = 2012:2018)
+
+plot_species_stacked(artis, producers = c("CHN", "MEX"))
+
+plot_species_stacked(artis, hs_codes = c("230120", "030613"))
