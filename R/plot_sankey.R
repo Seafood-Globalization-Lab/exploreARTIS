@@ -1,3 +1,20 @@
+#' Creates a Sankey plot of ARTIS data
+#' 
+#' This is a function that creates a sankey plot showcasing seafood supply chains from producer to importer in the ARTIS dataset.
+#' 
+#' @param data an ARTIS dataframe.
+#' @param prop_flow_cutoff default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".
+#' @param species list of species/species groups to include, default NA - includes all species.
+#' @param years list of years to include, default NA - includes all years.
+#' @param producers list of producers to include, default NA - includes all producers.
+#' @param exporters list of exporters to include, default NA - includes all exporters.
+#' @param importers list of importers to include, default NA - includes all importers.
+#' @param hs_codes list of hs level 6 codes to include, default NA - includes all hs6 codes.
+#' @param prod_method list of production methods (capture, aquaculture, etc), default NA - includes all production methods.
+#' @param prod_environment list of environments (marine, inland, etc), default NA - includes all environments
+#' @param export_source list of types of export (domestic export, foreign export, error export), default NA - all export sources.
+#' @param weight trade quantity type to visualize, default "live" for live weight, otherwise product weight
+#' @return None
 #' @import tidyverse
 #' @import countrycode
 #' @import networkD3
@@ -9,10 +26,6 @@ plot_sankey <- function(data, prop_flow_cutoff = 0.05,
                                            hs_codes = NA, prod_method = NA, prod_environment = NA,
                                            export_source = NA, 
                                            weight = "live") {
-  
-  # data should be an ARTIS data frame
-  # Default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5% 
-  # of the total trade are lumped together as "Other"
   
   # Select live or product weight
   if(weight == "live"){
