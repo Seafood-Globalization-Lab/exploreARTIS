@@ -87,3 +87,10 @@ plot_species_stacked(artis, hs_codes = c("230120", "030613"))
 # Testing mapping function
 
 
+# Testing plot_bar
+plot_bar(artis, bar_group = "importer_iso3c", fill_type = "method")
+plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "method")
+plot_bar(artis, bar_group = "sciname", fill_type = "method")
+plot_bar(artis, bar_group = "importer_iso3c", fill_type = "dom_source")
+plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
+plot_bar(artis, bar_group = "sciname", fill_type = "dom_source")
