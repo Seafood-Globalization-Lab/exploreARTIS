@@ -1,3 +1,22 @@
+#' Creates a chloropleth map with trade flows of ARTIS data
+#' 
+#' This is a function that creates a chloropleth map (optional) with trade flow arrows (optional)  based on the ARTIS dataset.
+#' 
+#' @param data an ARTIS dataframe.
+#' @param species list of species/species groups to include, default NA - includes all species.
+#' @param years list of years to include, default NA - includes all years.
+#' @param producers list of producers (as iso3 codes) to include, default NA - includes all producers.
+#' @param exporters list of exporters (as iso3 codes) to include, default NA - includes all exporters.
+#' @param importers list of importers (as iso3 codes) to include, default NA - includes all importers.
+#' @param hs_codes list of hs level 6 codes to include, default NA - includes all hs6 codes.
+#' @param prod_method list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.
+#' @param prod_environment list of environments (marine, inland, or unknown), default NA - includes all environments
+#' @param export_source list of types of export (domestic export, foreign export, or error export), default NA - all export sources.
+#' @param weight trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live." 
+#' @param country_fill optional variable by which to color countries - either "import" to color by total imports or export to color by total export.
+#' @param flow_arrows logical variable - set to TRUE to include top trade flow arrows. 
+#' @param n_flows number of top trade flow arrows to include if flow_arrows = TRUE - defaults to 10. 
+#' @return None
 #' @import tidyverse
 #' @import viridis
 #' @import sf
