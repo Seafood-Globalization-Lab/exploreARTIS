@@ -1,7 +1,6 @@
 #' Creates a stacked graph traded species from ARTIS data
 #' 
 #' This is a function that creates a stacked graph of traded species with one line per species.
-#' 
 #' @param data an ARTIS dataframe.
 #' @param prop_flow_cutoff default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".
 #' @param species list of species/species groups to include, default NA - includes all species.
