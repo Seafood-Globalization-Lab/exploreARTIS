@@ -5,6 +5,8 @@ library(DBI)
 library(tidyverse)
 library(exploreARTIS)
 library(countrycode)
+library(sf)
+library(rnaturalearth)
 
 # Load artis data from SQL
 # Load ARTIS data from SQL local database
@@ -81,3 +83,20 @@ plot_species_stacked(artis, years = 2012:2018)
 plot_species_stacked(artis, producers = c("CHN", "MEX"))
 
 plot_species_stacked(artis, hs_codes = c("230120", "030613"))
+
+# Testing mapping function
+
+
+# Testing plot_bar
+plot_bar(artis, bar_group = "importer_iso3c")
+plot_bar(artis, bar_group = "importer_iso3c", fill_type = "method")
+plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "method")
+plot_bar(artis, bar_group = "sciname", fill_type = "method")
+plot_bar(artis, bar_group = "importer_iso3c", fill_type = "dom_source")
+plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
+plot_bar(artis, bar_group = "sciname", fill_type = "dom_source")
+
+# Testing plot_chord
+plot_chord(artis, years = 2016)
+plot_chord(artis, years = 2016, focal_country = "USA")
+plot_chord(artis, years = 2016, focal_country = c("USA", "CHN"))

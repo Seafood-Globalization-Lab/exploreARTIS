@@ -28,21 +28,21 @@ plot_sankey(
 
 \item{years}{list of years to include, default NA - includes all years.}
 
-\item{producers}{list of producers to include, default NA - includes all producers.}
+\item{producers}{list of producers (as iso3 codes) to include, default NA - includes all producers.}
 
-\item{exporters}{list of exporters to include, default NA - includes all exporters.}
+\item{exporters}{list of exporters (as iso3 codes) to include, default NA - includes all exporters.}
 
-\item{importers}{list of importers to include, default NA - includes all importers.}
+\item{importers}{list of importers (as iso3 codes) to include, default NA - includes all importers.}
 
 \item{hs_codes}{list of hs level 6 codes to include, default NA - includes all hs6 codes.}
 
-\item{prod_method}{list of production methods (capture, aquaculture, etc), default NA - includes all production methods.}
+\item{prod_method}{list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.}
 
-\item{prod_environment}{list of environments (marine, inland, etc), default NA - includes all environments}
+\item{prod_environment}{list of environments (marine, inland, or unknown), default NA - includes all environments}
 
-\item{export_source}{list of types of export (domestic export, foreign export, error export), default NA - all export sources.}
+\item{export_source}{list of types of export (domestic export, foreign export, or error export), default NA - all export sources.}
 
-\item{weight}{trade quantity type to visualize, default "live" for live weight, otherwise product weight}
+\item{weight}{trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."}
 }
 \value{
 None

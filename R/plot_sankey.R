@@ -6,14 +6,14 @@
 #' @param prop_flow_cutoff default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".
 #' @param species list of species/species groups to include, default NA - includes all species.
 #' @param years list of years to include, default NA - includes all years.
-#' @param producers list of producers to include, default NA - includes all producers.
-#' @param exporters list of exporters to include, default NA - includes all exporters.
-#' @param importers list of importers to include, default NA - includes all importers.
+#' @param producers list of producers (as iso3 codes) to include, default NA - includes all producers.
+#' @param exporters list of exporters (as iso3 codes) to include, default NA - includes all exporters.
+#' @param importers list of importers (as iso3 codes) to include, default NA - includes all importers.
 #' @param hs_codes list of hs level 6 codes to include, default NA - includes all hs6 codes.
-#' @param prod_method list of production methods (capture, aquaculture, etc), default NA - includes all production methods.
-#' @param prod_environment list of environments (marine, inland, etc), default NA - includes all environments
-#' @param export_source list of types of export (domestic export, foreign export, error export), default NA - all export sources.
-#' @param weight trade quantity type to visualize, default "live" for live weight, otherwise product weight
+#' @param prod_method list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.
+#' @param prod_environment list of environments (marine, inland, or unknown), default NA - includes all environments
+#' @param export_source list of types of export (domestic export, foreign export, or error export), default NA - all export sources.
+#' @param weight trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."
 #' @return None
 #' @import tidyverse
 #' @import countrycode

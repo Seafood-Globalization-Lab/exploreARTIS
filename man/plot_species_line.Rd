@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_species_line.R
 \name{plot_species_line}
 \alias{plot_species_line}
-\title{Creates a line graph of ARTIS data by species}
+\title{Creates a line graph traded species from ARTIS data}
 \usage{
 plot_species_line(
   data,
@@ -29,27 +29,25 @@ plot_species_line(
 
 \item{years}{list of years to include, default NA - includes all years.}
 
-\item{producers}{list of producers to include, default NA - includes all producers.}
+\item{producers}{list of producers (as iso3 codes) to include, default NA - includes all producers.}
 
-\item{exporters}{list of exporters to include, default NA - includes all exporters.}
+\item{exporters}{list of exporters (as iso3 codes) to include, default NA - includes all exporters.}
 
-\item{importers}{list of importers to include, default NA - includes all importers.}
+\item{importers}{list of importers (as iso3 codes) to include, default NA - includes all importers.}
 
 \item{hs_codes}{list of hs level 6 codes to include, default NA - includes all hs6 codes.}
 
-\item{prod_method}{list of production methods (capture, aquaculture, etc), default NA - includes all production methods.}
+\item{prod_method}{list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.}
 
-\item{prod_environment}{list of environments (marine, inland, etc), default NA - includes all environments}
+\item{prod_environment}{list of environments (marine, inland, or unknown), default NA - includes all environments}
 
-\item{export_source}{list of types of export (domestic export, foreign export, error export), default NA - all export sources.}
+\item{export_source}{list of types of export (domestic export, foreign export, or error export), default NA - all export sources.}
 
-\item{weight}{trade quantity type to visualize, default "live" for live weight, otherwise product weight}
-
-\item{plot.title}{title for plot generated}
+\item{weight}{trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."}
 }
 \value{
-Line graph of ARTIS data by species.
+None
 }
 \description{
-This is a function that creates a line graph showcasing seafood trade volumes by species.
+This is a function that creates a line graph of traded species with one line per species.
 }

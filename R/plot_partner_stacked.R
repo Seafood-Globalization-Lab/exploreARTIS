@@ -1,22 +1,21 @@
-#' Creates a stacked line graph of ARTIS data by trade partner
+#' Creates a stacked graph import or export partners from ARTIS data
 #' 
-#' This is a function that creates a stacked line plot showcasing seafood trade volumes by trading partner.
+#' This is a function that creates a stacked graph of traded species with one line per species.
 #' 
 #' @param data an ARTIS dataframe.
-#' @param trade_flow trade partner type interested in stacking. Default = "export" - plots export partners to the focal region. "import" - plots import partners from focal region.
+#' @param trade_flow select whether to plot export partners ("export") or import partners ("import") - default is "export."
 #' @param prop_flow_cutoff default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".
 #' @param species list of species/species groups to include, default NA - includes all species.
 #' @param years list of years to include, default NA - includes all years.
-#' @param producers list of producers to include, default NA - includes all producers.
-#' @param exporters list of exporters to include, default NA - includes all exporters.
-#' @param importers list of importers to include, default NA - includes all importers.
+#' @param producers list of producers (as iso3 codes) to include, default NA - includes all producers.
+#' @param exporters list of exporters (as iso3 codes) to include, default NA - includes all exporters.
+#' @param importers list of importers (as iso3 codes) to include, default NA - includes all importers.
 #' @param hs_codes list of hs level 6 codes to include, default NA - includes all hs6 codes.
-#' @param prod_method list of production methods (capture, aquaculture, etc), default NA - includes all production methods.
-#' @param prod_environment list of environments (marine, inland, etc), default NA - includes all environments
-#' @param export_source list of types of export (domestic export, foreign export, error export), default NA - all export sources.
-#' @param weight trade quantity type to visualize, default "live" for live weight, otherwise product weight
-#' @param plot.title title for plot generated
-#' @return Stacked line graph of ARTIS data by trade flow (exporter, importer) partner
+#' @param prod_method list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.
+#' @param prod_environment list of environments (marine, inland, or unknown), default NA - includes all environments
+#' @param export_source list of types of export (domestic export, foreign export, or error export), default NA - all export sources.
+#' @param weight trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."
+#' @return None
 #' @import tidyverse
 #' @import countrycode
 #' @import viridis

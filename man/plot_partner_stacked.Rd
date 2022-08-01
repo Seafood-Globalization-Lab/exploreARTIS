@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_partner_stacked.R
 \name{plot_partner_stacked}
 \alias{plot_partner_stacked}
-\title{Creates a stacked line graph of ARTIS data by trade partner}
+\title{Creates a stacked graph import or export partners from ARTIS data}
 \usage{
 plot_partner_stacked(
   data,
@@ -24,7 +24,7 @@ plot_partner_stacked(
 \arguments{
 \item{data}{an ARTIS dataframe.}
 
-\item{trade_flow}{trade partner type interested in stacking. Default = "export" - plots export partners to the focal region. "import" - plots import partners from focal region.}
+\item{trade_flow}{select whether to plot export partners ("export") or import partners ("import") - default is "export."}
 
 \item{prop_flow_cutoff}{default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".}
 
@@ -32,27 +32,25 @@ plot_partner_stacked(
 
 \item{years}{list of years to include, default NA - includes all years.}
 
-\item{producers}{list of producers to include, default NA - includes all producers.}
+\item{producers}{list of producers (as iso3 codes) to include, default NA - includes all producers.}
 
-\item{exporters}{list of exporters to include, default NA - includes all exporters.}
+\item{exporters}{list of exporters (as iso3 codes) to include, default NA - includes all exporters.}
 
-\item{importers}{list of importers to include, default NA - includes all importers.}
+\item{importers}{list of importers (as iso3 codes) to include, default NA - includes all importers.}
 
 \item{hs_codes}{list of hs level 6 codes to include, default NA - includes all hs6 codes.}
 
-\item{prod_method}{list of production methods (capture, aquaculture, etc), default NA - includes all production methods.}
+\item{prod_method}{list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.}
 
-\item{prod_environment}{list of environments (marine, inland, etc), default NA - includes all environments}
+\item{prod_environment}{list of environments (marine, inland, or unknown), default NA - includes all environments}
 
-\item{export_source}{list of types of export (domestic export, foreign export, error export), default NA - all export sources.}
+\item{export_source}{list of types of export (domestic export, foreign export, or error export), default NA - all export sources.}
 
-\item{weight}{trade quantity type to visualize, default "live" for live weight, otherwise product weight}
-
-\item{plot.title}{title for plot generated}
+\item{weight}{trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."}
 }
 \value{
-Stacked line graph of ARTIS data by trade flow (exporter, importer) partner
+None
 }
 \description{
-This is a function that creates a stacked line plot showcasing seafood trade volumes by trading partner.
+This is a function that creates a stacked graph of traded species with one line per species.
 }
