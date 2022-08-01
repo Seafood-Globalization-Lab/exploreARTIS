@@ -95,3 +95,8 @@ plot_bar(artis, bar_group = "sciname", fill_type = "method")
 plot_bar(artis, bar_group = "importer_iso3c", fill_type = "dom_source")
 plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
 plot_bar(artis, bar_group = "sciname", fill_type = "dom_source")
+
+# Testing plot_chord
+plot_chord(artis, years = 2016)
+plot_chord(artis, years = 2016, focal_country = "USA")
+plot_chord(artis, years = 2016, focal_country = c("USA", "CHN"))
