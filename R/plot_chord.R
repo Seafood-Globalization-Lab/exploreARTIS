@@ -92,7 +92,7 @@ plot_chord <- function(data, focal_country = NA,
         exporter_region = case_when((exporter_iso3c %in% focal_country) ~ exporter_iso3c,
                                          TRUE ~ exporter_region))
   
-  country_to_region <- get_country_to_region_trade(data) %>%
+  country_to_region <- get_country_to_region_trade(data, quantity) %>%
     abbrev_region() 
 
     chordDiagram(country_to_region,
