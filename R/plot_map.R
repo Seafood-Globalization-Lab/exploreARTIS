@@ -23,6 +23,7 @@
 #' @import rnaturalearth
 #' @import CoordinateCleaner
 #' @import cowplot
+#' @import ggthemes
 #' @export
 
 plot_map <- function(data,
@@ -111,7 +112,7 @@ plot_map <- function(data,
   if(flow_arrows == TRUE){
     # Create centroids data frame
     country_centroids <- countryref %>%
-      filter(str_count(adm1_code)==3) %>%
+      filter(str_count(as.character(adm1_code))==3) %>%
       group_by(iso3) %>%
       summarise(centroid.lon = mean(centroid.lon),
                 centroid.lat = mean(centroid.lat))

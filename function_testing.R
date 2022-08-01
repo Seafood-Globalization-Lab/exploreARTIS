@@ -7,6 +7,7 @@ library(exploreARTIS)
 library(countrycode)
 library(sf)
 library(rnaturalearth)
+library(CoordinateCleaner)
 
 # Load artis data from SQL
 # Load ARTIS data from SQL local database
@@ -85,7 +86,9 @@ plot_species_stacked(artis, producers = c("CHN", "MEX"))
 plot_species_stacked(artis, hs_codes = c("230120", "030613"))
 
 # Testing mapping function
-
+artis %>% 
+  filter(exporter_iso3c == "USA") %>%
+  plot_map(country_fill = "import", flow_arrows = TRUE, n_flows = 10)
 
 # Testing plot_bar
 plot_bar(artis, bar_group = "importer_iso3c")
