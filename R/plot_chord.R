@@ -62,7 +62,7 @@ plot_chord <- function(data, focal_country = NA,
   ss_afr <- "#355936" # Forest Green
   euro <- "#0686E5" # Light Blue "#00FFFF" # Cyan 
   
-  if(sum(is.na(country_iso)) > 0){
+  if(sum(is.na(focal_country)) > 0){
     # Less transparent when no focal country is selected
     trans_value <- "80"
   }else{
