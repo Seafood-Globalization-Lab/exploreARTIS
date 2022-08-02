@@ -9,6 +9,7 @@ plot_chord <- function(data, focal_country = NA,
                        hs_codes = NA, prod_method = NA, prod_environment = NA,
                        export_source = NA, 
                        weight = "live"){
+  
   # Select live or product weight
   if(weight == "live"){
     quantity <- "live_weight_t"
@@ -54,13 +55,13 @@ plot_chord <- function(data, focal_country = NA,
   iso_all_trade <- "black" # Navy
   
   # Sector colors for all regions
-  e_asia <- "#142B58" # Navy 
-  s_asia <- "#792560" # Purple
-  lat_amer <- "#F35D2D" #Other option: "#13808F" # Teal
-  n_amer <- "#39A584" # Sea Green
-  mid_east <- "#C78F0B"# Gold
-  ss_afr <- "#355936" # Forest Green
-  euro <- "#0686E5" # Light Blue "#00FFFF" # Cyan 
+  # e_asia <- "#142B58" # Navy 
+  # s_asia <- "#792560" # Purple
+  # lat_amer <- "#F35D2D" #Other option: "#13808F" # Teal
+  # n_amer <- "#39A584" # Sea Green
+  # mid_east <- "#C78F0B"# Gold
+  # ss_afr <- "#355936" # Forest Green
+  # euro <- "#0686E5" # Light Blue "#00FFFF" # Cyan 
   
   if(sum(is.na(focal_country)) > 0){
     # Less transparent when no focal country is selected
@@ -69,6 +70,8 @@ plot_chord <- function(data, focal_country = NA,
     # For exports not destined for ISO: set to 40% transparency
     trans_value <- "40"
   }
+  
+  print(e_asia)
 
   e_asia_other <- paste(e_asia, trans_value, sep = "")
   s_asia_other <- paste(s_asia, trans_value, sep = "")
@@ -77,6 +80,8 @@ plot_chord <- function(data, focal_country = NA,
   mid_east_other <- paste(mid_east, trans_value, sep = "")
   ss_afr_other <- paste(ss_afr, trans_value, sep = "")
   euro_other <- paste(euro, trans_value, sep = "")
+  
+  
   
   # Add region columns
   data <- data %>%
