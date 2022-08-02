@@ -31,6 +31,7 @@ plot_map <- function(data,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
                      export_source = NA, weight = "live",
                      country_fill = NA, flow_arrows = FALSE, n_flows = 10){
+  
   # Select live or product weight
   if(weight == "live"){
     quantity <- "live_weight_t"
@@ -109,12 +110,6 @@ plot_map <- function(data,
   }
   
   if(flow_arrows == TRUE){
-    # Create centroids data frame
-    country_centroids <- countryref %>%
-      filter(str_count(as.character(adm1_code))==3) %>%
-      group_by(iso3) %>%
-      summarise(centroid.lon = mean(centroid.lon),
-                centroid.lat = mean(centroid.lat))
     
     flows_df <- data %>%
       group_by(importer_iso3c, exporter_iso3c) %>% 
