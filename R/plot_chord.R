@@ -48,20 +48,7 @@ plot_chord <- function(data, focal_country = NA,
     {if (sum(is.na(export_source)) == 0)
       filter(., dom_source %in% export_source)
       else .} 
-  
-  # Set colors
-  # Define Oceana color palette
-  # Sector and link colors for focal ISO both imports and exports
-  iso_all_trade <- "black" # Navy
-  
-  # Sector colors for all regions
-  # e_asia <- "#142B58" # Navy 
-  # s_asia <- "#792560" # Purple
-  # lat_amer <- "#F35D2D" #Other option: "#13808F" # Teal
-  # n_amer <- "#39A584" # Sea Green
-  # mid_east <- "#C78F0B"# Gold
-  # ss_afr <- "#355936" # Forest Green
-  # euro <- "#0686E5" # Light Blue "#00FFFF" # Cyan 
+
   
   if(sum(is.na(focal_country)) > 0){
     # Less transparent when no focal country is selected
@@ -70,19 +57,7 @@ plot_chord <- function(data, focal_country = NA,
     # For exports not destined for ISO: set to 40% transparency
     trans_value <- "40"
   }
-  
-  print(e_asia)
 
-  e_asia_other <- paste(e_asia, trans_value, sep = "")
-  s_asia_other <- paste(s_asia, trans_value, sep = "")
-  lat_amer_other <- paste(lat_amer, trans_value, sep = "")
-  n_amer_other <- paste(n_amer, trans_value, sep = "")
-  mid_east_other <- paste(mid_east, trans_value, sep = "")
-  ss_afr_other <- paste(ss_afr, trans_value, sep = "")
-  euro_other <- paste(euro, trans_value, sep = "")
-  
-  
-  
   # Add region columns
   data <- data %>%
     mutate(importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "region")),
@@ -102,7 +77,7 @@ plot_chord <- function(data, focal_country = NA,
 
     chordDiagram(country_to_region,
                  grid.col = sector_color_fun(country_to_region, country_iso = focal_country),
-                 col = link_transparency_fun(country_to_region, country_iso = focal_country),
+                 col = link_transparency_fun(country_to_region, country_iso = focal_country, trans_value),
                  order = sector_order_fun(country_to_region, country_iso = focal_country),
                  annotationTrack = c("name", "grid"),
                  directional = 1,

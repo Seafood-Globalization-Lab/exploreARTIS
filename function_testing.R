@@ -8,6 +8,7 @@ library(countrycode)
 library(sf)
 library(rnaturalearth)
 library(CoordinateCleaner)
+library(circlize)
 
 # Load artis data from SQL
 # Load ARTIS data from SQL local database

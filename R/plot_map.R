@@ -22,7 +22,6 @@
 #' @import sf
 #' @import rnaturalearth
 #' @import CoordinateCleaner
-#' @import cowplot
 #' @import ggthemes
 #' @export
 

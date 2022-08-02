@@ -1,4 +1,7 @@
 
+# Sector and link colors for focal ISO 
+iso_all_trade <- "black" 
+
 # Sector colors for all regions
 e_asia <- "#142B58" # Navy 
 s_asia <- "#792560" # Purple
