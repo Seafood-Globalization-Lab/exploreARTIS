@@ -37,7 +37,7 @@ dbDisconnect(con)
 rm(list = c("con"))
 
 # Test plot_partner_stacked function
-plot_partner_stacked(artis, trade_flow = "import")
+plot_partner_stacked(artis, trade_flow = "import", prop_flow_cutoff = 0.02)
 plot_partner_stacked(artis, trade_flow = "export")
 
 plot_partner_stacked(artis, species = "salmo salar", trade_flow = "import")
@@ -69,7 +69,7 @@ plot_partner_stacked(artis, trade_flow = "import", export_source = "foreign expo
 plot_partner_stacked(artis, trade_flow = "export", export_source = "foreign export")
 
 # Test plot_partner_line function
-plot_partner_line(artis, trade_flow = "import")
+plot_partner_line(artis, trade_flow = "import", prop_flow_cutoff = 0.02)
 plot_partner_line(artis, trade_flow = "export")
 
 plot_partner_line(artis, trade_flow = "import", weight = "live")
