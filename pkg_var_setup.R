@@ -15,11 +15,14 @@ ss_afr <- "#355936" # Forest Green
 euro <- "#0686E5" # Light Blue "#00FFFF" # Cyan
 
 # Create centroids data frame - for map plot
+# FIXIT: Check Kiribati centroid spans east west - point showing up in the wrong place
 country_centroids <- countryref %>%
   filter(str_count(as.character(adm1_code))==3) %>%
   group_by(iso3) %>%
   summarise(centroid.lon = mean(centroid.lon),
             centroid.lat = mean(centroid.lat))
+
+countryref <- countryref
 
 # Save all variables for later use by package
 save.image(file = "R/sysdata.rda")
