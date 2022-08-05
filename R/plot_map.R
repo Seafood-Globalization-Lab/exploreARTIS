@@ -19,7 +19,6 @@
 #' @return None
 #' @import tidyverse
 #' @import viridis
-#' @import sf
 #' @import rnaturalearth
 #' @importFrom ggthemes theme_map
 #' @export
