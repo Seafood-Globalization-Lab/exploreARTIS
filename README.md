@@ -18,8 +18,9 @@ Visualize and summarize ARTIS data. ARTIS data consists of:
 
 ## Installation
 
+### Setup
 **Mac Users** Run the following commands in terminal:
-```
+```bash
 brew install pkg-config
 brew install gdal
 ```
@@ -28,8 +29,12 @@ Once installed run the following command in the R console:
 install.packages("sf", configure.args = "--with-proj-lib=/usr/local/lib/")
 ```
 
-**Windows Users** Please make sure you have Rtoosl installed first. Follow the instructions here
+**Windows Users** Please make sure you have Rtools installed first. Follow the instructions [here](https://cran.r-project.org/bin/windows/Rtools/). Then run the following command in the R console:
+```r
+install.packages("sf")
+```
 
+### exploreARTIS Package installation
 You can install this package with the devtools package. The first time you do it you will have to run install.package("devtools"). After that, you will only need to run library(devtools). Then, you can run devtools::install_github("Seafood-Globalization-Lab/exploreARTIS", dependencies = TRUE).
 
 After you install the exploreARTIS package, you can just load it with library(exploreARTIS). You will also need to reinstall the package whenever there are updates to the package code.
@@ -38,7 +43,7 @@ After you install the exploreARTIS package, you can just load it with library(ex
 
 Here are examples of all the types of plots that can be created with this package. (Assume that "artis" in this example is a variable that contains an artis dataset)
 
-# Analyzing volumes
+### Analyzing volumes
 
 ```r
 # loading library
