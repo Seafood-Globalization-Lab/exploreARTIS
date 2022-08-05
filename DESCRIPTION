@@ -16,7 +16,6 @@ Imports:
     ggthemes,
     networkD3,
     rnaturalearth,
-    sf,
     tidyverse,
     viridis
 RoxygenNote: 7.2.0
