@@ -21,8 +21,7 @@
 #' @import viridis
 #' @import sf
 #' @import rnaturalearth
-#' @import CoordinateCleaner
-#' @import ggthemes
+#' @importFrom ggthemes theme_map
 #' @export
 
 plot_map <- function(data,
