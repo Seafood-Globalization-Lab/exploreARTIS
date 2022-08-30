@@ -82,7 +82,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       ggplot(aes(x = quantity, y = bar_group, fill = .data[[fill_type]])) +
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c("#F7AF75", "#2E8D9A", "#86ADA7")) +
-      labs(x = quantity.lab, y = "") +
+      labs(x = quantity.lab, y = "", title = plot.title) +
       theme_bw()
   }
 }
