@@ -108,3 +108,11 @@ plot_chord(artis, years = 2000, prod_method = "aquaculture", focal_country = "US
 plot_chord(artis, years = 2018, prod_method = "aquaculture", focal_country = "USA")
 
 plot_chord(artis, years = 2016, focal_country = c("USA", "CHN"))
+
+# Testing calculate_supply
+supply <- calculate_supply(artis, prod)
+
+
+
+
+
