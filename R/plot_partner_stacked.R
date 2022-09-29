@@ -23,7 +23,7 @@
 
 plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff = 0.05, 
                                  species = NA, years = NA,
-                                 producers = NA, exporters = NA, importers = NA,
+                                 producers = NA, exporters = NA, importers = NA, regions = NA,
                                  hs_codes = NA, prod_method = NA, prod_environment = NA,
                                  export_source = NA, 
                                  weight = "live",
@@ -81,6 +81,23 @@ plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff =
     partner.lab <- "Exporter"
   }
   
+  # change partner to a region if defined
+  if (!is.na(regions)) {
+    
+    partner_var <- ensym(partner)
+    quantity_var <- ensym(quantity)
+    
+    data <- data %>%
+      mutate(!!partner_var := countrycode(!!partner_var, origin = "iso3c", destination = regions)) %>%
+      mutate(!!partner_var := case_when(
+        is.na(!!partner_var) ~ "Other",
+        TRUE ~ !!partner_var
+      )) %>%
+      group_by(year, !!partner_var) %>%
+      summarize(!!quantity_var := sum(!!quantity_var, na.rm = TRUE))
+    
+  }
+  
   data <- data %>%
     group_by(year, .data[[partner]]) %>%
     summarise(quantity = sum(.data[[quantity]], na.rm = TRUE)) %>%
@@ -103,8 +120,11 @@ plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff =
   data %>%
     full_join(partner_year_grid, by = c("year", "partner")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
-    mutate(partner.name = suppressWarnings(countrycode(partner, origin = "iso3c", destination = "country.name"))) %>%
-    mutate(partner.name = ifelse(is.na(partner.name), "Other", partner.name)) %>%
+    {if (is.na(regions))
+      mutate(., partner.name = suppressWarnings(countrycode(partner, origin = "iso3c", destination = "country.name"))) %>%
+        mutate(partner.name = ifelse(is.na(partner.name), "Other", partner.name))
+      else
+        rename(., partner.name = partner)} %>%
     mutate(partner.name = fct_reorder(partner.name, quantity)) %>%
     ungroup() %>%
     group_by(year, partner.name) %>%
