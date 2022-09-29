@@ -5,3 +5,5 @@
 .Renviron
 .Rproj
 *.Rproj
+.DS_Store
+qa/
