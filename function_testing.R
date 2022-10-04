@@ -28,6 +28,7 @@ plot_partner_stacked(artis, trade_flow = "export")
 
 plot_partner_stacked(artis, trade_flow = "export", regions = "owid")
 plot_partner_stacked(artis, trade_flow = "export", regions = "region23")
+plot_partner_stacked(artis, trade_flow = "export", regions = "region")
 
 plot_partner_stacked(artis, species = "salmo salar", trade_flow = "import")
 plot_partner_stacked(artis, species = "salmo salar", trade_flow = "export")
