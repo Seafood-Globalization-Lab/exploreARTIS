@@ -25,7 +25,7 @@ plot_partner_line <- function(data, trade_flow, prop_flow_cutoff = 0.05,
                               species = NA, years = NA, producers = NA, 
                               exporters = NA, importers = NA, regions = NA,
                               hs_codes = NA, prod_method = NA, prod_environment = NA,
-                              export_source = NA, region_self_loops = NA,
+                              export_source = NA, region_self_loops = TRUE,
                               weight = "live",
                               plot.title = "") {
   
@@ -109,6 +109,12 @@ plot_partner_line <- function(data, trade_flow, prop_flow_cutoff = 0.05,
             TRUE ~ importer_region
           )
         )
+    }
+    
+    # Check if self loops need to be removed
+    if (region_self_loops = FALSE) {
+      data <- data %>%
+        filter(exporter_region != importer_region)
     }
     
     # redefine partner variable for region
