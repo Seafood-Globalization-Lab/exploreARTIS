@@ -7,7 +7,8 @@ owid_regions <- owid_regions %>%
   mutate(country_name = countrycode(Code, origin = "iso3c", destination = "country.name")) %>%
   filter(!is.na(country_name)) %>%
   select(Code, country_name, Continent) %>%
-  distinct()
+  distinct() %>%
+  rename(region = Continent)
 
 names(owid_regions) <- tolower(names(owid_regions))
 
