@@ -24,6 +24,7 @@
 plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff = 0.05, 
                                  species = NA, years = NA,
                                  producers = NA, exporters = NA, importers = NA, regions = NA,
+                                 region_self_loops = TRUE,
                                  hs_codes = NA, prod_method = NA, prod_environment = NA,
                                  export_source = NA, 
                                  weight = "live",
@@ -81,22 +82,73 @@ plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff =
     partner.lab <- "Exporter"
   }
   
-  # change partner to a region if defined
+  #-----------------------------------------------------------------------------
+  # Regional flow edits and name changing for countries
+  
+  # Checking if regions want to be displayed
   if (!is.na(regions)) {
+    if (regions == "owid") {
+      # Default regional definitions - Our World in Data
+      data <- convert_owid_regions(data)
+      
+    } else {
+      # Regional definitions provided by user
+      
+      data <- data %>%
+        # Initial conversion from iso3c codes to regions
+        mutate(exporter_region = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = regions)),
+               importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = regions))) %>%
+        # Cleaning up any NAs (ie Other nei)
+        mutate(
+          exporter_region = case_when(
+            is.na(exporter_region) ~ "Other",
+            TRUE ~ exporter_region),
+          importer_region = case_when(
+            is.na(importer_region) ~ "Other",
+            TRUE ~ importer_region
+          )
+        )
+    }
     
-    partner_var <- ensym(partner)
-    quantity_var <- ensym(quantity)
+    # Check if self loops need to be removed
+    if (region_self_loops == FALSE) {
+      data <- data %>%
+        filter(exporter_region != importer_region)
+    }
     
+    # redefine partner variable for region
+    if (partner == "exporter_iso3c") {
+      partner <- "exporter_region"
+    } else {
+      partner <- "importer_region"
+    }
+  } else {
+    # Conversion from iso3 codes to country name
     data <- data %>%
-      mutate(!!partner_var := countrycode(!!partner_var, origin = "iso3c", destination = regions)) %>%
-      mutate(!!partner_var := case_when(
-        is.na(!!partner_var) ~ "Other",
-        TRUE ~ !!partner_var
-      )) %>%
-      group_by(year, !!partner_var) %>%
-      summarize(!!quantity_var := sum(!!quantity_var, na.rm = TRUE))
+      # Initial conversion
+      mutate(
+        exporter_name = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = "country.name")),
+        importer_name = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "country.name"))
+      ) %>%
+      # Cleaning any NAs (ie from Other nei)
+      mutate(
+        exporter_name = case_when(
+          is.na(exporter_name) ~ "Other",
+          TRUE ~ exporter_name),
+        importer_name = case_when(
+          is.na(importer_name) ~ "Other",
+          TRUE ~ importer_name)
+      )
     
+    # redefine partner variable for region
+    if (partner == "exporter_iso3c") {
+      partner <- "exporter_name"
+    } else {
+      partner <- "importer_name"
+    }
   }
+  #-----------------------------------------------------------------------------
+  # Summarizing by user defined trade flow (ie by exporter or importer)
   
   data <- data %>%
     group_by(year, .data[[partner]]) %>%
@@ -120,12 +172,7 @@ plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff =
   data %>%
     full_join(partner_year_grid, by = c("year", "partner")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
-    {if (is.na(regions))
-      mutate(., partner.name = suppressWarnings(countrycode(partner, origin = "iso3c", destination = "country.name"))) %>%
-        mutate(partner.name = ifelse(is.na(partner.name), "Other", partner.name))
-      else
-        rename(., partner.name = partner)} %>%
-    mutate(partner.name = fct_reorder(partner.name, quantity)) %>%
+    mutate(partner.name = fct_reorder(partner, quantity)) %>%
     ungroup() %>%
     group_by(year, partner.name) %>%
     summarize(quantity = sum(quantity)) %>%

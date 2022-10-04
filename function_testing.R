@@ -10,35 +10,24 @@ library(rnaturalearth)
 library(CoordinateCleaner)
 library(circlize)
 
-# Load artis data from SQL
-# Load ARTIS data from SQL local database
-con <- dbConnect(RPostgres::Postgres(),
-                 dbname=Sys.getenv("POSTGRES_DB"),
-                 host="localhost",
-                 port="5432",
-                 user=Sys.getenv("POSTGRES_USER"),
-                 password=Sys.getenv("POSTGRES_PASSWORD"))
+artis <- read.csv("data/sample_snet.csv")
 
-# Check that connection is established by checking which tables are present
-dbListTables(con)
+# Test plot_partner_line function-----------------------------------------------
+plot_partner_line(artis, trade_flow = "import", prop_flow_cutoff = 0.02)
+plot_partner_line(artis, trade_flow = "export")
 
-# Pull all ARTIS and production data
-artis <- dbGetQuery(con, "SELECT * FROM snet") 
-artis <- artis %>%
-  select(-record_id)
+plot_partner_line(artis, trade_flow = "import", weight = "live")
+plot_partner_line(artis, trade_flow = "import", weight = "product")
 
-prod <- dbGetQuery(con, "SELECT * FROM production")
-prod <- prod %>%
-  select(-record_id)
+plot_partner_line(artis, trade_flow = "export", regions = "owid")
+plot_partner_line(artis, trade_flow = "export", regions = "region23")
 
-# Close database connection
-dbDisconnect(con)
-
-rm(list = c("con"))
-
-# Test plot_partner_stacked function
+# Test plot_partner_stacked function--------------------------------------------
 plot_partner_stacked(artis, trade_flow = "import", prop_flow_cutoff = 0.02)
 plot_partner_stacked(artis, trade_flow = "export")
+
+plot_partner_stacked(artis, trade_flow = "export", regions = "owid")
+plot_partner_stacked(artis, trade_flow = "export", regions = "region23")
 
 plot_partner_stacked(artis, species = "salmo salar", trade_flow = "import")
 plot_partner_stacked(artis, species = "salmo salar", trade_flow = "export")
@@ -68,12 +57,7 @@ plot_partner_stacked(artis, trade_flow = "export", prod_method = "capture", prod
 plot_partner_stacked(artis, trade_flow = "import", export_source = "foreign export")
 plot_partner_stacked(artis, trade_flow = "export", export_source = "foreign export")
 
-# Test plot_partner_line function
-plot_partner_line(artis, trade_flow = "import", prop_flow_cutoff = 0.02)
-plot_partner_line(artis, trade_flow = "export")
 
-plot_partner_line(artis, trade_flow = "import", weight = "live")
-plot_partner_line(artis, trade_flow = "import", weight = "product")
 
 # Test plot_species_stacked function
 plot_species_stacked(artis)

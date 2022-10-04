@@ -112,7 +112,7 @@ plot_partner_line <- function(data, trade_flow, prop_flow_cutoff = 0.05,
     }
     
     # Check if self loops need to be removed
-    if (region_self_loops = FALSE) {
+    if (region_self_loops == FALSE) {
       data <- data %>%
         filter(exporter_region != importer_region)
     }
