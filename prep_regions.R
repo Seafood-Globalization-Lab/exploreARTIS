@@ -2,6 +2,7 @@
 library(tidyverse)
 library(countrycode)
 
+# Preparing conversion data
 owid_regions <- read.csv("data/continents-according-to-our-world-in-data.csv")
 owid_regions <- owid_regions %>%
   mutate(country_name = countrycode(Code, origin = "iso3c", destination = "country.name")) %>%
