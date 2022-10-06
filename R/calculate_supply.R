@@ -17,7 +17,7 @@ calculate_supply <- function(artis_data, production_data){
                               "sciname", "method", "habitat")) %>%
     full_join(production_data %>% 
                 rename(production_t = live_weight_t), by = c("year", "exporter_iso3c" = "iso3c", 
-                           "sciname", "method" = "prod_method", "habitat")) 
+                                                             "sciname", "method", "habitat")) 
   
   supply$foreign_export[is.na(supply$foreign_export)] <- 0
   supply$domestic_export[is.na(supply$domestic_export)] <- 0
