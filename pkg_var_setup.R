@@ -14,6 +14,17 @@ mid_east <- "#C78F0B"# Gold
 ss_afr <- "#355936" # Forest Green
 euro <- "#0686E5" # Light Blue "#00FFFF" # Cyan
 
+region6_palette <- c(
+  "#741A32", # maroon
+  "#B34232", # burnt orange
+  "#D38F35", #  orange
+  "#D4B95F", # khaki
+  "#4FA2A2", # teal
+  "#114F59" # dark teal
+)
+
+owid_regions <- read.csv("/Volumes/jgephart/ARTIS/Outputs/exploreARTIS_files/owid_regions.csv")
+
 # Create centroids data frame - for map plot
 # FIXIT: Check Kiribati centroid spans east west - point showing up in the wrong place
 country_centroids <- countryref %>%
