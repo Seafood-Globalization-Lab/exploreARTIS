@@ -3,21 +3,21 @@
 
 calculate_supply <- function(artis_data, production_data){
   exports <- artis_data %>%
-    group_by(year, exporter_iso3c, dom_source, sciname, method, environment) %>%
+    group_by(year, exporter_iso3c, dom_source, sciname, method, habitat) %>%
     summarise(live_weight_t = sum(live_weight_t)) %>%
     mutate(dom_source = str_replace(dom_source, " ", "_")) %>%
     pivot_wider(names_from = "dom_source", values_from = "live_weight_t")
   
   imports <- artis_data %>%
-    group_by(year, importer_iso3c, sciname, method, environment) %>%
+    group_by(year, importer_iso3c, sciname, method, habitat) %>%
     summarise(imports_live_weight_t = sum(live_weight_t))
   
   supply <- exports %>%
     full_join(imports, by = c("year", "exporter_iso3c" = "importer_iso3c", 
-                              "sciname", "method", "environment")) %>%
+                              "sciname", "method", "habitat")) %>%
     full_join(production_data %>% 
                 rename(production_t = live_weight_t), by = c("year", "exporter_iso3c" = "iso3c", 
-                           "sciname", "method" = "prod_method", "environment")) 
+                           "sciname", "method" = "prod_method", "habitat")) 
   
   supply$foreign_export[is.na(supply$foreign_export)] <- 0
   supply$domestic_export[is.na(supply$domestic_export)] <- 0
