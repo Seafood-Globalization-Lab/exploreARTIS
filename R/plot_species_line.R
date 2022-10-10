@@ -27,20 +27,18 @@ plot_species_line <- function(data, prop_flow_cutoff = 0.05,
                                  export_source = NA, 
                                  weight = "live",
                                  plot.title = ""){
-  # data should be an ARTIS data frame
-  # Default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5% 
-  # of the total trade are lumped together as "Other"
-  
+
+  # Setting up parameters based on user input-----------------------------------
   # Select live or product weight
-  if(weight == "live"){
+  if (weight == "live") {
     quantity <- "live_weight_t"
     quantity.lab <- "Quantity (t live weight)"
-  }else{
+  } else {
     quantity <- "product_weight_t"
     quantity.lab <- "Quantity (t product weight)"
   }
   
-  # Filter to data selection
+  # Filtering data based on user input------------------------------------------
   data <- data %>%
     {if (sum(is.na(species)) == 0)
       filter(., sciname %in% species)
@@ -70,6 +68,7 @@ plot_species_line <- function(data, prop_flow_cutoff = 0.05,
       filter(., dom_source %in% export_source)
       else .} 
   
+  # Creating a dataframe for species by year------------------------------------
   data <- data %>%
     group_by(year, sciname) %>%
     summarise(quantity = sum(.data[[quantity]], na.rm = TRUE)) %>%
@@ -77,8 +76,10 @@ plot_species_line <- function(data, prop_flow_cutoff = 0.05,
     group_by(year) %>%
     mutate(global_annual = sum(quantity)) %>%
     mutate(prop_flow = quantity / global_annual) %>%
+    # Use prop flow cutoff to redefine species names
     mutate(sciname = if_else(prop_flow < prop_flow_cutoff, true = "Other", 
                              false = sciname)) %>%
+    # Re-summarize based on new naming criteria for species
     group_by(year, sciname) %>%
     summarise(quantity = sum(quantity)) %>%
     ungroup()
@@ -95,6 +96,7 @@ plot_species_line <- function(data, prop_flow_cutoff = 0.05,
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
     mutate(sciname = ifelse(is.na(sciname), "Other", sciname)) %>%
     mutate(sciname = fct_reorder(sciname, quantity)) %>%
+    # Plot line graph
     ggplot() +
     geom_line(aes(x = year, y = quantity, color = sciname)) +
     scale_fill_viridis_d() +
