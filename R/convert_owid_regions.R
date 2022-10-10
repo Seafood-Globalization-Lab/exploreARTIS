@@ -1,8 +1,10 @@
-
+#' Transform ARTIS from country to regional data
+#' 
+#' Function that takes an ARTIS dataframe and summarizes source, export and import countries as regions.
+#' @param df - An ARTIS dataframe (needs to include source_country_iso3c, exporter_iso3c, importer_iso3c)
 #' @import tidyverse
 #' @import countrycode
 #' @export
-
 convert_owid_regions <- function(df) {
   
   df <- df %>%
