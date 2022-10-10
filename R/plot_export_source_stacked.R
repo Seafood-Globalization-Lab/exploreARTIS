@@ -25,8 +25,8 @@ plot_export_source_stacked <- function(data,
                                      export_source = NA, 
                                      weight = "live",
                                      plot.title = ""){
-  # data should be an ARTIS data frame
-  
+
+  # Setting up parameters based on user input-----------------------------------
   # Select live or product weight
   if(weight == "live"){
     quantity <- "live_weight_t"
@@ -36,7 +36,7 @@ plot_export_source_stacked <- function(data,
     quantity.lab <- "Quantity (t product weight)"
   }
   
-  # Filter to data selection
+  # Filtering data based on user input------------------------------------------
   data <- data %>%
     {if (sum(is.na(species)) == 0)
       filter(., sciname %in% species)
@@ -64,8 +64,10 @@ plot_export_source_stacked <- function(data,
       else .} %>%
     {if (sum(is.na(export_source)) == 0)
       filter(., dom_source %in% export_source)
-      else .} 
+      else .}
   
+  # Dom source dataframe and Visualization--------------------------------------
+  # Create dataframe of dom source (domestic export, foreign export, etc) by year
   data <- data %>%
     group_by(year, dom_source) %>%
     summarise(quantity = sum(.data[[quantity]], na.rm = TRUE)) %>%
@@ -83,6 +85,7 @@ plot_export_source_stacked <- function(data,
   data %>%
     full_join(dom_source_year_grid, by = c("year", "dom_source")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
+    # Plot stacked line graph
     ggplot() +
     geom_area(aes(x = year, y = quantity, fill = dom_source)) +
     scale_fill_viridis_d() +

@@ -26,9 +26,9 @@ plot_hs_product_line <- function(data,
                                   hs_codes = NA, prod_method = NA, prod_environment = NA,
                                   export_source = NA, 
                                   weight = "live",
-                                  plot.title = ""){
-  # data should be an ARTIS data frame
+                                  plot.title = "") {
   
+  # Setting up parameters based on user input-----------------------------------
   # Select live or product weight
   if(weight == "live"){
     quantity <- "live_weight_t"
@@ -38,7 +38,7 @@ plot_hs_product_line <- function(data,
     quantity.lab <- "Quantity (t product weight)"
   }
   
-  # Filter to data selection
+  # Filtering data based on user input------------------------------------------
   data <- data %>%
     {if (sum(is.na(species)) == 0)
       filter(., sciname %in% species)
@@ -68,6 +68,7 @@ plot_hs_product_line <- function(data,
       filter(., dom_source %in% export_source)
       else .} 
   
+  # Creating dataframe hs code by year------------------------------------------
   data <- data %>%
     group_by(year, hs6) %>%
     summarise(quantity = sum(.data[[quantity]], na.rm = TRUE)) %>%
@@ -76,7 +77,9 @@ plot_hs_product_line <- function(data,
     group_by(year) %>%
     mutate(global_annual = sum(quantity)) %>%
     mutate(prop_flow = quantity / global_annual) %>%
+    # Renaming based on prop flow cutoff
     mutate(hs6 = if_else(prop_flow < prop_flow_cutoff, true = "Other", false = hs6)) %>%
+    # Resummarize based on new naming
     group_by(year, hs6) %>%
     summarise(quantity = sum(quantity)) %>%
     ungroup()
@@ -90,6 +93,7 @@ plot_hs_product_line <- function(data,
   data %>%
     full_join(hs6_year_grid, by = c("year", "hs6")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
+    # Plot line graph
     ggplot() +
     geom_line(aes(x = year, y = quantity, color = hs6)) +
     scale_color_viridis_d() +

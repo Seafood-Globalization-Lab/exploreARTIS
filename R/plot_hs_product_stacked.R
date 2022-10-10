@@ -28,20 +28,28 @@ plot_hs_product_stacked <- function(data, trade_flow = "export", prop_flow_cutof
                                  export_source = NA, 
                                  weight = "live",
                                  plot.title = ""){
-  # data should be an ARTIS data frame
-  # Default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5% 
-  # of the total trade are lumped together as "Other"
-  
+
+  # Setting up parameters based on user input-----------------------------------
   # Select live or product weight
   if(weight == "live"){
     quantity <- "live_weight_t"
     quantity.lab <- "Quantity (t live weight)"
-  }else{
+  } else {
     quantity <- "product_weight_t"
     quantity.lab <- "Quantity (t product weight)"
   }
   
-  # Filter to data selection
+  # trade_flow = import to plot import partners from the focal region
+  # trade_flow = export to plot export partners to the focal region
+  if(trade_flow == "import"){
+    partner <- "importer_iso3c"
+    partner.lab <- "Importer"
+  }else{
+    partner <- "exporter_iso3c"
+    partner.lab <- "Exporter"
+  }
+  
+  # Filtering data based on user input------------------------------------------
   data <- data %>%
     {if (sum(is.na(species)) == 0)
       filter(., sciname %in% species)
@@ -69,18 +77,9 @@ plot_hs_product_stacked <- function(data, trade_flow = "export", prop_flow_cutof
       else .} %>%
     {if (sum(is.na(export_source)) == 0)
       filter(., dom_source %in% export_source)
-      else .} 
+      else .}
   
-  # trade_flow = import to plot import partners from the focal region
-  # trade_flow = export to plot export partners to the focal region
-  if(trade_flow == "import"){
-    partner <- "importer_iso3c"
-    partner.lab <- "Importer"
-  }else{
-    partner <- "exporter_iso3c"
-    partner.lab <- "Exporter"
-  }
-  
+  # Creating dataframe hs code by year------------------------------------------
   data <- data %>%
     group_by(year, hs6) %>%
     summarise(quantity = sum(.data[[quantity]], na.rm = TRUE)) %>%
@@ -88,7 +87,9 @@ plot_hs_product_stacked <- function(data, trade_flow = "export", prop_flow_cutof
     group_by(year) %>%
     mutate(global_annual = sum(quantity)) %>%
     mutate(prop_flow = quantity / global_annual) %>%
+    # Renaming based on prop flow cutoff
     mutate(hs6 = if_else(prop_flow < prop_flow_cutoff, true = "Other", false = hs6)) %>%
+    # Resummarize based on new naming
     group_by(year, hs6) %>%
     summarise(quantity = sum(quantity)) %>%
     ungroup()
@@ -108,6 +109,7 @@ plot_hs_product_stacked <- function(data, trade_flow = "export", prop_flow_cutof
     group_by(year, hs6) %>%
     summarize(quantity = sum(quantity)) %>%
     ungroup() %>%
+    # Plot stacked line graph
     ggplot() +
     geom_area(aes(x = year, y = quantity, fill = hs6)) +
     scale_fill_viridis_d() +
