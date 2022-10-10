@@ -1,3 +1,20 @@
+#' ARTIS Bar Chart
+#' 
+#' Function that creates a bar chart for ARTIS data.
+#' 
+#' @param data an ARTIS dataframe.
+#' @param bar_group refers to which column for the bars that will be visualized (ie exporter_iso3c, importer_iso3c, sciname)
+#' @param species list of species/species groups to include, default NA - includes all species.
+#' @param years list of years to include, default NA - includes all years.
+#' @param producers list of producers (as iso3 codes) to include, default NA - includes all producers.
+#' @param exporters list of exporters (as iso3 codes) to include, default NA - includes all exporters.
+#' @param importers list of importers (as iso3 codes) to include, default NA - includes all importers.
+#' @param hs_codes list of hs level 6 codes to include, default NA - includes all hs6 codes.
+#' @param prod_method list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.
+#' @param prod_environment list of environments (marine, inland, or unknown), default NA - includes all environments
+#' @param export_source list of types of export (domestic export, foreign export, or error export), default NA - all export sources.
+#' @param fill_type column to use to stack the bars (ie by method, habitat)
+#' @param weight trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."
 #' @import tidyverse
 #' @import countrycode
 #' @import viridis
@@ -13,6 +30,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   # data should be an ARTIS data frame
   # of the total trade are lumped together as "Other"
   
+  # Setting up parameters based on user input-----------------------------------
   # Select live or product weight
   if(weight == "live"){
     quantity <- "live_weight_t"
@@ -21,8 +39,8 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
     quantity <- "product_weight_t"
     quantity.lab <- "Quantity (t product weight)"
   }
-
-  # Filter to data selection
+  
+  # Filter to data selection based on user input--------------------------------
   data <- data %>%
     {if (sum(is.na(species)) == 0)
       filter(., sciname %in% species)
@@ -46,25 +64,34 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       filter(., method %in% prod_method)
       else .} %>%
     {if (sum(is.na(prod_environment)) == 0)
-      filter(., environment %in% prod_environment)
+      filter(., habitat %in% prod_environment)
       else .} %>%
     {if (sum(is.na(export_source)) == 0)
       filter(., dom_source %in% export_source)
       else .} 
   
+  # Bar Chart Creation----------------------------------------------------------
+  
   if(is.na(fill_type) == TRUE){
+    # Bar chart with no stacking "fill" group
     data %>% 
+      # Summarizing data based on column for bars "bar group"
       group_by(.data[[bar_group]]) %>%
       summarise(quantity = sum(.data[[quantity]], na.rm=TRUE)) %>%
       ungroup() %>%
+      # Getting top n values
       slice_max(order_by = quantity, n = top_n) %>%
       rename("bar_group" = .data[[bar_group]]) %>%
       mutate(bar_group = fct_reorder(bar_group, quantity)) %>%
+      # Creating Bar Chart
       ggplot(aes(x = quantity, y = bar_group)) +
       geom_bar(stat = "identity") +
       labs(x = quantity.lab, y = "") +
       theme_bw()
-  }else{
+  } else {
+    # Case when there is a "fill" or stacking column for bar chart
+    
+    # Getting a list of top n bars
     top_n_list <- data %>%
       rename("bar_group" = .data[[bar_group]]) %>%
       group_by(bar_group) %>%
@@ -72,6 +99,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       ungroup() %>%
       slice_max(order_by = total_quantity, n = top_n)
     
+    # Getting data for the top n bars
     top_n_list %>% 
       left_join(data %>% 
                   rename("bar_group" = .data[[bar_group]]), 
@@ -79,6 +107,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       mutate(bar_group = fct_reorder(bar_group, total_quantity)) %>%
       group_by(bar_group, .data[[fill_type]]) %>%
       summarise(quantity = sum(.data[[quantity]], na.rm=TRUE)) %>%
+      # Creating Bar Chart
       ggplot(aes(x = quantity, y = bar_group, fill = .data[[fill_type]])) +
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c("#F7AF75", "#2E8D9A", "#86ADA7")) +
