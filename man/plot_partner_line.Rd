@@ -13,10 +13,12 @@ plot_partner_line(
   producers = NA,
   exporters = NA,
   importers = NA,
+  regions = NA,
   hs_codes = NA,
   prod_method = NA,
   prod_environment = NA,
   export_source = NA,
+  region_self_loops = TRUE,
   weight = "live",
   plot.title = ""
 )
@@ -38,6 +40,8 @@ plot_partner_line(
 
 \item{importers}{list of importers (as iso3 codes) to include, default NA - includes all importers.}
 
+\item{regions}{default NA- will not aggregate trade to a regional level. Options include: owid (ARTIS regions), or destination codes defined by R package countrycode.}
+
 \item{hs_codes}{list of hs level 6 codes to include, default NA - includes all hs6 codes.}
 
 \item{prod_method}{list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.}
@@ -52,5 +56,5 @@ plot_partner_line(
 None
 }
 \description{
-This is a function that creates a line graph of traded species with one line per species.
+This is a function that creates a line graph showcasing volumes by trade partners. This can be aggregated at a regional level.
 }

@@ -13,6 +13,8 @@ plot_partner_stacked(
   producers = NA,
   exporters = NA,
   importers = NA,
+  regions = NA,
+  region_self_loops = TRUE,
   hs_codes = NA,
   prod_method = NA,
   prod_environment = NA,
@@ -37,6 +39,8 @@ plot_partner_stacked(
 \item{exporters}{list of exporters (as iso3 codes) to include, default NA - includes all exporters.}
 
 \item{importers}{list of importers (as iso3 codes) to include, default NA - includes all importers.}
+
+\item{regions}{default NA- will not aggregate trade to a regional level. Options include: owid (ARTIS regions), or destination codes defined by R package countrycode.}
 
 \item{hs_codes}{list of hs level 6 codes to include, default NA - includes all hs6 codes.}
 
