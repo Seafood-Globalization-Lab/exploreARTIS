@@ -10,6 +10,7 @@
 #' @param producers list of producers (as iso3 codes) to include, default NA - includes all producers.
 #' @param exporters list of exporters (as iso3 codes) to include, default NA - includes all exporters.
 #' @param importers list of importers (as iso3 codes) to include, default NA - includes all importers.
+#' @param regions default NA- will not aggregate trade to a regional level. Options include: owid (ARTIS regions), or destination codes defined by R package countrycode.
 #' @param hs_codes list of hs level 6 codes to include, default NA - includes all hs6 codes.
 #' @param prod_method list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.
 #' @param prod_environment list of environments (marine, inland, or unknown), default NA - includes all environments
@@ -29,20 +30,28 @@ plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff =
                                  export_source = NA, 
                                  weight = "live",
                                  plot.title = ""){
-  # data should be an ARTIS data frame
-  # Default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5% 
-  # of the total trade are lumped together as "Other"
-  
+
+  # Setting up parameters based on user input-----------------------------------
   # Select live or product weight
   if(weight == "live"){
     quantity <- "live_weight_t"
     quantity.lab <- "Quantity (t live weight)"
-  }else{
+  } else {
     quantity <- "product_weight_t"
     quantity.lab <- "Quantity (t product weight)"
   }
   
-  # Filter to data selection
+  # trade_flow = import to plot import partners from the focal region
+  # trade_flow = export to plot export partners to the focal region
+  if(trade_flow == "import") {
+    partner <- "importer_iso3c"
+    partner.lab <- "Importer"
+  } else {
+    partner <- "exporter_iso3c"
+    partner.lab <- "Exporter"
+  }
+  
+  # Filtering data based on user input------------------------------------------
   data <- data %>%
     {if (sum(is.na(species)) == 0)
       filter(., sciname %in% species)
@@ -70,17 +79,7 @@ plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff =
       else .} %>%
     {if (sum(is.na(export_source)) == 0)
       filter(., dom_source %in% export_source)
-      else .} 
-  
-  # trade_flow = import to plot import partners from the focal region
-  # trade_flow = export to plot export partners to the focal region
-  if(trade_flow == "import"){
-    partner <- "importer_iso3c"
-    partner.lab <- "Importer"
-  }else{
-    partner <- "exporter_iso3c"
-    partner.lab <- "Exporter"
-  }
+      else .}
   
   #-----------------------------------------------------------------------------
   # Regional flow edits and name changing for countries
