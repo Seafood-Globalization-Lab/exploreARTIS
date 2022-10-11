@@ -11,6 +11,8 @@ library(CoordinateCleaner)
 library(circlize)
 
 artis <- read.csv("data/sample_snet.csv")
+# Region data for testing
+artis_regional <- read.csv("/Volumes/jgephart/ARTIS/Outputs/S_net/snet_20220928/regional_snet.csv")
 
 # Test plot_partner_line function-----------------------------------------------
 plot_partner_line(artis, trade_flow = "import", prop_flow_cutoff = 0.02)
@@ -94,6 +96,9 @@ plot_chord(artis, years = 2018, prod_method = "aquaculture", focal_country = "US
 
 plot_chord(artis, years = 2016, focal_country = c("USA", "CHN"))
 
+# Test plot_chord for region
+plot_chord(artis_regional, years = 2016, 
+           prod_method = "capture", prod_environment = "marine", plot_region = TRUE)
 # Testing calculate_supply
 supply <- calculate_supply(artis, prod)
 

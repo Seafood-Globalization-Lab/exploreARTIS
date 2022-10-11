@@ -8,7 +8,7 @@ plot_chord <- function(data, focal_country = NA,
                        producers = NA, exporters = NA, importers = NA,
                        hs_codes = NA, prod_method = NA, prod_environment = NA,
                        export_source = NA, 
-                       weight = "live"){
+                       weight = "live", plot_region = FALSE){
   
   # Select live or product weight
   if(weight == "live"){
@@ -43,7 +43,7 @@ plot_chord <- function(data, focal_country = NA,
       filter(., method %in% prod_method)
       else .} %>%
     {if (sum(is.na(prod_environment)) == 0)
-      filter(., environment %in% prod_environment)
+      filter(., habitat %in% prod_environment)
       else .} %>%
     {if (sum(is.na(export_source)) == 0)
       filter(., dom_source %in% export_source)
@@ -59,22 +59,42 @@ plot_chord <- function(data, focal_country = NA,
   }
 
   # Add region columns
-  data <- data %>%
-    mutate(importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "region")),
-           exporter_region = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = "region"))) %>%
-    filter(!is.na(importer_region),
-           !is.na(exporter_region)) %>%
-    # If a focal country is selected, replace the region name with the country iso
+  if(plot_region == FALSE){
+    data <- data %>%
+      mutate(importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "region")),
+             exporter_region = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = "region"))) %>%
+      filter(!is.na(importer_region),
+             !is.na(exporter_region)) %>%
+      # If a focal country is selected, replace the region name with the country iso
       mutate(
         importer_region = case_when((importer_iso3c %in% focal_country) ~ importer_iso3c,
-                                         TRUE ~ importer_region),
-             
+                                    TRUE ~ importer_region),
+        
         exporter_region = case_when((exporter_iso3c %in% focal_country) ~ exporter_iso3c,
-                                         TRUE ~ exporter_region))
+                                    TRUE ~ exporter_region))
+    
+    country_to_region <- get_country_to_region_trade(data, quantity) %>%
+      abbrev_region() 
+  }else{
+    country_to_region <- data %>%
+      group_by(exporter_region, importer_region) %>%
+      summarise(total_quantity = sum(.data[[quantity]], na.rm = TRUE)) 
+  }
   
-  country_to_region <- get_country_to_region_trade(data, quantity) %>%
-    abbrev_region() 
-
+  if(sum(is.na(focal_country)) > 0){
+    chordDiagram(country_to_region,
+                 #grid.col = sector_color_fun(country_to_region),
+                 #col = link_transparency_fun(country_to_region, trans_value),
+                 #order = sector_order_fun(country_to_region),
+                 annotationTrack = c("name", "grid"),
+                 directional = 1,
+                 direction.type = c("diffHeight", "arrows"),
+                 link.arr.type = "big.arrow",
+                 link.target.prop = FALSE,
+                 diffHeight = 0.08,
+                 link.sort = TRUE)
+  }else{
+    # For exports not destined for ISO: set to 40% transparency
     chordDiagram(country_to_region,
                  grid.col = sector_color_fun(country_to_region, country_iso = focal_country),
                  col = link_transparency_fun(country_to_region, country_iso = focal_country, trans_value),
@@ -86,4 +106,6 @@ plot_chord <- function(data, focal_country = NA,
                  link.target.prop = FALSE,
                  diffHeight = 0.08,
                  link.sort = TRUE)
+  }
+
 }
