@@ -73,16 +73,8 @@ plot_chord <- function(data, focal_country = NA,
       filter(., dom_source %in% export_source)
       else .}
 
-<<<<<<< HEAD
   # Add region columns
   if(plot_region == FALSE){
-    data <- data %>%
-      mutate(importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "region")),
-             exporter_region = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = "region"))) %>%
-      filter(!is.na(importer_region),
-             !is.na(exporter_region)) %>%
-      # If a focal country is selected, replace the region name with the country iso
-=======
   # Adding regional classification----------------------------------------------
   data <- data %>%
     mutate(importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "region")),
@@ -90,7 +82,6 @@ plot_chord <- function(data, focal_country = NA,
     filter(!is.na(importer_region),
            !is.na(exporter_region)) %>%
     # If a focal country is selected, replace the region name with the country iso
->>>>>>> 440843e296f7282a7ed3ee1ccf485b2b484008ac
       mutate(
         importer_region = case_when((importer_iso3c %in% focal_country) ~ importer_iso3c,
                                     TRUE ~ importer_region),
@@ -106,7 +97,6 @@ plot_chord <- function(data, focal_country = NA,
       summarise(total_quantity = sum(.data[[quantity]], na.rm = TRUE)) 
   }
   
-<<<<<<< HEAD
   if(sum(is.na(focal_country)) > 0){
     chordDiagram(country_to_region,
                  #grid.col = sector_color_fun(country_to_region),
@@ -134,7 +124,6 @@ plot_chord <- function(data, focal_country = NA,
                  link.sort = TRUE)
   }
 
-=======
   # Re-summarizing data based on regional classification
   country_to_region <- get_country_to_region_trade(data, quantity) %>%
     # Abbreviating region names
@@ -152,5 +141,4 @@ plot_chord <- function(data, focal_country = NA,
                link.target.prop = FALSE,
                diffHeight = 0.08,
                link.sort = TRUE)
->>>>>>> 440843e296f7282a7ed3ee1ccf485b2b484008ac
 }

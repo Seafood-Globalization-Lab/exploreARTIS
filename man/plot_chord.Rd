@@ -16,7 +16,8 @@ plot_chord(
   prod_method = NA,
   prod_environment = NA,
   export_source = NA,
-  weight = "live"
+  weight = "live",
+  plot_region = FALSE
 )
 }
 \arguments{
