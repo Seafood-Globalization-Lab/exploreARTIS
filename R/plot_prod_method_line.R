@@ -87,8 +87,8 @@ plot_prod_method_line <- function(data,
     full_join(method_year_grid, by = c("year", "method")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
     ggplot() +
-    geom_line(aes(x = year, y = quantity, color = method)) +
-    scale_color_viridis_d() +
+    geom_line(aes(x = year, y = quantity, color = method), size = 1.1) +
+    scale_color_manual(values = c("#741A32", "#114F59", "#D38F35")) +
     labs(y = quantity.lab, x = "Year", title = plot.title, color = "Production Method") +
     theme_bw() 
 }

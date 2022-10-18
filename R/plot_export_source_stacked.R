@@ -88,7 +88,7 @@ plot_export_source_stacked <- function(data,
     # Plot stacked line graph
     ggplot() +
     geom_area(aes(x = year, y = quantity, fill = dom_source)) +
-    scale_fill_viridis_d() +
+    scale_fill_manual(values = artis_palette(length(unique(data$dom_source)))) +
     labs(y = quantity.lab, x = "Year", title = plot.title, fill = "Export Source") +
     theme_bw() 
 }

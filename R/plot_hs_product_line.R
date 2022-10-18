@@ -95,8 +95,8 @@ plot_hs_product_line <- function(data,
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
     # Plot line graph
     ggplot() +
-    geom_line(aes(x = year, y = quantity, color = hs6)) +
-    scale_color_viridis_d() +
+    geom_line(aes(x = year, y = quantity, color = hs6), size = 1.1) +
+    scale_color_manual(values = artis_palette(length(unique(data$hs6)))) +
     labs(y = quantity.lab, x = "Year", title = plot.title, color = "HS 6 Digit Code") +
     theme_bw() 
 }

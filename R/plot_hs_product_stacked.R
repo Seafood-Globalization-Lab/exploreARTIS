@@ -112,7 +112,7 @@ plot_hs_product_stacked <- function(data, trade_flow = "export", prop_flow_cutof
     # Plot stacked line graph
     ggplot() +
     geom_area(aes(x = year, y = quantity, fill = hs6)) +
-    scale_fill_viridis_d() +
+    scale_fill_manual(values = artis_palette(length(unique(data$hs6)))) +
     labs(y = quantity.lab, x = "Year", title = plot.title, fill = "HS 6 Digit Code") +
     theme_bw() 
 }

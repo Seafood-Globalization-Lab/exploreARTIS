@@ -91,15 +91,17 @@ plot_species_line <- function(data, prop_flow_cutoff = 0.05,
   
   # Bind stacked line graph data to grid so that zeroes can be filled in for "missing" years
   # Need to do this for time series to plot correctly
-  data %>%
+  data <- data %>%
     full_join(sciname_year_grid, by = c("year", "sciname")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
     mutate(sciname = ifelse(is.na(sciname), "Other", sciname)) %>%
-    mutate(sciname = fct_reorder(sciname, quantity)) %>%
+    mutate(sciname = fct_reorder(sciname, quantity))
+  
+  data %>%
     # Plot line graph
     ggplot() +
-    geom_line(aes(x = year, y = quantity, color = sciname)) +
-    scale_fill_viridis_d() +
+    geom_line(aes(x = year, y = quantity, color = sciname), size = 1.1) +
+    scale_color_manual(values = artis_palette(length(unique(data$sciname)))) +
     labs(y = quantity.lab, x = "Year", title = plot.title, color = "Species/species group") +
     theme_bw() 
 }

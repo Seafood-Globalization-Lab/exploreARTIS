@@ -85,7 +85,7 @@ plot_prod_method_stacked <- function(data,
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
     ggplot() +
     geom_area(aes(x = year, y = quantity, fill = method)) +
-    scale_fill_viridis_d() +
+    scale_fill_manual(values = c("#741A32", "#114F59", "#D38F35")) +
     labs(y = quantity.lab, x = "Year", title = plot.title, fill = "Production Method") +
     theme_bw() 
 }
