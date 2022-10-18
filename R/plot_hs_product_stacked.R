@@ -105,6 +105,8 @@ plot_hs_product_stacked <- function(data, trade_flow = "export", prop_flow_cutof
     full_join(hs6_year_grid, by = c("year", "hs6")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
     mutate(hs6 = fct_reorder(hs6, quantity)) %>%
+    # Reorder so that "Other" always last
+    mutate(hs6 = forcats::fct_relevel(hs6, "Other", after = Inf)) %>%
     ungroup() %>%
     group_by(year, hs6) %>%
     summarize(quantity = sum(quantity)) %>%

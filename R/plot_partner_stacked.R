@@ -176,7 +176,9 @@ plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff =
     ungroup() %>%
     group_by(year, partner.name) %>%
     summarize(quantity = sum(quantity)) %>%
-    ungroup()
+    ungroup() %>%
+    # Reorder so that "Other" always last
+    mutate(partner.name = forcats::fct_relevel(partner.name, "Other", after = Inf))
   
   data %>%
     ggplot() +

@@ -170,7 +170,9 @@ plot_partner_line <- function(data, trade_flow, prop_flow_cutoff = 0.05,
   data <- data %>%
     full_join(partner_year_grid, by = c("year", "partner")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
-    mutate(partner.name = fct_reorder(partner, quantity))
+    mutate(partner.name = fct_reorder(partner, quantity)) %>%
+    # Reorder so that "Other" always last
+    mutate(partner.name = forcats::fct_relevel(partner.name, "Other", after = Inf))
   
   data %>%
     ggplot() +

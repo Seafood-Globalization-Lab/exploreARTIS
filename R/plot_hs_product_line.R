@@ -82,7 +82,10 @@ plot_hs_product_line <- function(data,
     # Resummarize based on new naming
     group_by(year, hs6) %>%
     summarise(quantity = sum(quantity)) %>%
-    ungroup()
+    ungroup() %>%
+    mutate(hs6 = fct_reorder(hs6, quantity)) %>%
+    # Reorder so that "Other" always last
+    mutate(hs6 = forcats::fct_relevel(hs6, "Other", after = Inf))
   
   # Create full list of partners and years 
   hs6_year_grid <- expand_grid(year = unique(data$year),
