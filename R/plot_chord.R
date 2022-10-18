@@ -19,7 +19,7 @@
 
 plot_chord <- function(data, focal_country = NA,
                        species = NA, years = NA,
-                       producers = NA, exporters = NA, importers = NA, regions = NA,
+                       producers = NA, exporters = NA, importers = NA,
                        hs_codes = NA, prod_method = NA, prod_environment = NA,
                        export_source = NA, 
                        weight = "live", plot_region = FALSE){
@@ -72,46 +72,38 @@ plot_chord <- function(data, focal_country = NA,
     {if (sum(is.na(export_source)) == 0)
       filter(., dom_source %in% export_source)
       else .}
-
+  
   # Add region columns
-  if(plot_region == FALSE) {
+  if(plot_region == FALSE){
     # Adding regional classification----------------------------------------------
+    data <- data %>%
+      mutate(importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "region")),
+             exporter_region = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = "region"))) %>%
+      filter(!is.na(importer_region),
+             !is.na(exporter_region)) %>%
+      # If a focal country is selected, replace the region name with the country iso
+      mutate(
+        importer_region = case_when((importer_iso3c %in% focal_country) ~ importer_iso3c,
+                                    TRUE ~ importer_region),
+        
+        exporter_region = case_when((exporter_iso3c %in% focal_country) ~ exporter_iso3c,
+                                    TRUE ~ exporter_region))
     
-    if (is.na(regions)) {
-      
-      # Adding codes 
-      data <- data %>%
-        left_join(owid_regions %>%
-                    select(code, region) %>%
-                    rename(exporter_region = region),
-                  by = c("exporter_iso3c" = "code")) %>%
-        left_join(owid_regions %>%
-                    select(code, region) %>%
-                    rename(importer_region = region),
-                  by = c("importer_iso3c" = "code"))
-    } else {
-      
-      data <- data %>%
-        mutate(importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "region")),
-               exporter_region = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = "region"))) %>%
-        filter(!is.na(importer_region),
-               !is.na(exporter_region)) %>%
-        # If a focal country is selected, replace the region name with the country iso
-        mutate(
-          importer_region = case_when((importer_iso3c %in% focal_country) ~ importer_iso3c,
-                                      TRUE ~ importer_region),
-          
-          exporter_region = case_when((exporter_iso3c %in% focal_country) ~ exporter_iso3c,
-                                      TRUE ~ exporter_region))
-    }
-    
+    country_to_region <- get_country_to_region_trade(data, quantity) %>%
+      abbrev_region() 
+  } else {
+    country_to_region <- data %>%
+      group_by(exporter_region, importer_region) %>%
+      summarise(total_quantity = sum(.data[[quantity]], na.rm = TRUE)) 
   }
   
-  country_to_region <- data %>%
-    group_by(exporter_region, importer_region) %>%
-    summarise(total_quantity = sum(.data[[quantity]], na.rm = TRUE))
+  # Re-summarizing data based on regional classification
+  country_to_region <- get_country_to_region_trade(data, quantity) %>%
+    # Abbreviating region names
+    abbrev_region()
   
-  if(sum(is.na(focal_country)) > 0){
+  
+  if(sum(!is.na(focal_country)) > 0){
     chordDiagram(country_to_region,
                  #grid.col = sector_color_fun(country_to_region),
                  #col = link_transparency_fun(country_to_region, trans_value),
@@ -137,22 +129,4 @@ plot_chord <- function(data, focal_country = NA,
                  diffHeight = 0.08,
                  link.sort = TRUE)
   }
-
-  # Re-summarizing data based on regional classification
-  country_to_region <- get_country_to_region_trade(data, quantity) %>%
-    # Abbreviating region names
-    abbrev_region()
-  
-  # Creating Chord Diagram------------------------------------------------------
-  chordDiagram(country_to_region,
-               grid.col = sector_color_fun(country_to_region, country_iso = focal_country),
-               col = link_transparency_fun(country_to_region, country_iso = focal_country, trans_value),
-               order = sector_order_fun(country_to_region, country_iso = focal_country),
-               annotationTrack = c("name", "grid"),
-               directional = 1,
-               direction.type = c("diffHeight", "arrows"),
-               link.arr.type = "big.arrow",
-               link.target.prop = FALSE,
-               diffHeight = 0.08,
-               link.sort = TRUE)
 }
