@@ -92,6 +92,13 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       select(-country_name)
   }
   
+  # Factors for bar ordering----------------------------------------------------
+  data$dom_source <- factor(data$dom_source,
+                            levels = c("domestic export", "foreign export", "error export"))
+  
+  data$method <- factor(data$method,
+                        levels = c("aquaculture", "capture", "unknown"))
+  
   # Bar Chart Creation----------------------------------------------------------
   
   if(is.na(fill_type) == TRUE){
@@ -132,7 +139,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       # Creating Bar Chart
       ggplot(aes(x = quantity, y = bar_group, fill = .data[[fill_type]])) +
       geom_bar(stat = "identity") +
-      scale_fill_manual(values = c("#741A32", "#114F59", "#D38F35")) +
+      scale_fill_manual(values = c("#114F59", "#741A32", "#D38F35")) +
       labs(x = quantity.lab, y = "", fill = fill_lab, title = plot.title) +
       theme_bw()
   }
