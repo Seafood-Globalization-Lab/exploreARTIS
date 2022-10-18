@@ -97,7 +97,7 @@ plot_species_stacked <- function(data, prop_flow_cutoff = 0.05,
     # PLot line graph
     ggplot() +
     geom_area(aes(x = year, y = quantity, fill = sciname)) +
-    scale_fill_viridis_d() +
+    scale_fill_viridis_d(option = "plasma") +
     labs(y = quantity.lab, x = "Year", title = plot.title, fill = "Species/species group") +
     theme_bw() 
 }

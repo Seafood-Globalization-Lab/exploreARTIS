@@ -178,7 +178,7 @@ plot_partner_stacked <- function(data, trade_flow = "export", prop_flow_cutoff =
     ungroup() %>%
     ggplot() +
     geom_area(aes(x = year, y = quantity, fill = partner.name)) +
-    scale_fill_viridis_d() +
+    scale_fill_viridis_d(option = "plasma") +
     labs(y = quantity.lab, x = "Year", title = plot.title, fill = partner.lab) +
     theme_bw() 
 }
