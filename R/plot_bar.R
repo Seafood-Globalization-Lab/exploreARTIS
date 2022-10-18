@@ -40,6 +40,12 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
     quantity.lab <- "Quantity (t product weight)"
   }
   
+  if (fill_type == "dom_source") {
+    fill_lab <- "Export Source"
+  } else if (fill_type == "method") {
+    fill_lab <- "Production Method"
+  }
+  
   # Filter to data selection based on user input--------------------------------
   data <- data %>%
     {if (sum(is.na(species)) == 0)
@@ -127,7 +133,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       ggplot(aes(x = quantity, y = bar_group, fill = .data[[fill_type]])) +
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c("#741A32", "#114F59", "#D38F35")) +
-      labs(x = quantity.lab, y = "", title = plot.title) +
+      labs(x = quantity.lab, y = "", fill = fill_lab, title = plot.title) +
       theme_bw()
   }
 }
