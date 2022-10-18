@@ -43,7 +43,12 @@ dbDisconnect(con)
 
 rm(list = c("con"))
 
-artis <- read.csv("data/sample_snet.csv")
+artis <- read.csv("data/sample_snet.csv") %>%
+  mutate(hs6 = as.character(hs6)) %>%
+  mutate(hs6 = case_when(
+    str_length(hs6) == 5 ~ paste("0", hs6, sep = ""),
+    TRUE ~ hs6
+  ))
 regional_artis <- read.csv("/Volumes/jgephart/ARTIS/Outputs/S_net/snet_20220928/regional_snet.csv")
 
 # Test regional sankey function-------------------------------------------------
@@ -52,7 +57,7 @@ plot_regional_sankey_method_habitat(regional_artis, 2019, 2019)
 
 
 # Test plot_partner_line function-----------------------------------------------
-plot_partner_line(artis, trade_flow = "import", prop_flow_cutoff = 0.02)
+plot_partner_line(artis, trade_flow = "import", prop_flow_cutoff = 0.05)
 plot_partner_line(artis, trade_flow = "export")
 
 plot_partner_line(artis, trade_flow = "import", weight = "live")
@@ -62,7 +67,7 @@ plot_partner_line(artis, trade_flow = "export", regions = "owid")
 plot_partner_line(artis, trade_flow = "export", regions = "region23")
 
 # Test plot_partner_stacked function--------------------------------------------
-plot_partner_stacked(artis, trade_flow = "import", prop_flow_cutoff = 0.02)
+plot_partner_stacked(artis, trade_flow = "import", prop_flow_cutoff = 0.05)
 plot_partner_stacked(artis, trade_flow = "export")
 
 plot_partner_stacked(artis, trade_flow = "export", regions = "owid")
@@ -97,7 +102,8 @@ plot_partner_stacked(artis, trade_flow = "export", prod_method = "capture", prod
 plot_partner_stacked(artis, trade_flow = "import", export_source = "foreign export")
 plot_partner_stacked(artis, trade_flow = "export", export_source = "foreign export")
 
-
+# Test plot_species_line function
+plot_species_line(artis, species = c("salmo salar", "thunnus albacares"))
 
 # Test plot_species_stacked function
 plot_species_stacked(artis)
@@ -109,6 +115,24 @@ plot_species_stacked(artis, years = 2012:2018)
 plot_species_stacked(artis, producers = c("CHN", "MEX"))
 
 plot_species_stacked(artis, hs_codes = c("230120", "030613"))
+
+# Test plot_export_source_line function
+plot_export_source_line(artis)
+
+# Test plot_export_source_stacked function
+plot_export_source_stacked(artis)
+
+# Test plot_prod_method_line function
+plot_hs_product_line(artis)
+
+# Test plot_prod_method_stacked function
+plot_hs_product_stacked(artis)
+
+# Test plot_prod_method_line function
+plot_prod_method_line(artis)
+
+# Test plot_prod_method_stacked function
+plot_prod_method_stacked(artis)
 
 # Testing mapping function
 artis %>% 

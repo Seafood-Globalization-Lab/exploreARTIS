@@ -12,6 +12,7 @@ plot_chord(
   producers = NA,
   exporters = NA,
   importers = NA,
+  regions = NA,
   hs_codes = NA,
   prod_method = NA,
   prod_environment = NA,
