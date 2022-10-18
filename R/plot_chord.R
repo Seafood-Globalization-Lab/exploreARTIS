@@ -19,7 +19,7 @@
 
 plot_chord <- function(data, focal_country = NA,
                        species = NA, years = NA,
-                       producers = NA, exporters = NA, importers = NA,
+                       producers = NA, exporters = NA, importers = NA, regions = NA,
                        hs_codes = NA, prod_method = NA, prod_environment = NA,
                        export_source = NA, 
                        weight = "live") {
@@ -74,18 +74,34 @@ plot_chord <- function(data, focal_country = NA,
       else .}
 
   # Adding regional classification----------------------------------------------
-  data <- data %>%
-    mutate(importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "region")),
-           exporter_region = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = "region"))) %>%
-    filter(!is.na(importer_region),
-           !is.na(exporter_region)) %>%
-    # If a focal country is selected, replace the region name with the country iso
+  
+  if (is.na(regions)) {
+    
+    # Adding codes 
+    data <- data %>%
+      left_join(owid_regions %>%
+                  select(code, region) %>%
+                  rename(exporter_region = region),
+                by = c("exporter_iso3c" = "code")) %>%
+      left_join(owid_regions %>%
+                  select(code, region) %>%
+                  rename(importer_region = region),
+                by = c("importer_iso3c" = "code"))
+  } else {
+    
+    data <- data %>%
+      mutate(importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = "region")),
+             exporter_region = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = "region"))) %>%
+      filter(!is.na(importer_region),
+             !is.na(exporter_region)) %>%
+      # If a focal country is selected, replace the region name with the country iso
       mutate(
         importer_region = case_when((importer_iso3c %in% focal_country) ~ importer_iso3c,
-                                         TRUE ~ importer_region),
-             
+                                    TRUE ~ importer_region),
+        
         exporter_region = case_when((exporter_iso3c %in% focal_country) ~ exporter_iso3c,
-                                         TRUE ~ exporter_region))
+                                    TRUE ~ exporter_region))
+  }
   
   # Re-summarizing data based on regional classification
   country_to_region <- get_country_to_region_trade(data, quantity) %>%
