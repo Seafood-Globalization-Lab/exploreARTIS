@@ -95,7 +95,7 @@ plot_species_stacked <- function(data, prop_flow_cutoff = 0.05,
     mutate(sciname = ifelse(is.na(sciname), "Other", sciname)) %>%
     mutate(sciname = fct_reorder(sciname, quantity)) %>%
     # Reorder so that "Other" always last
-    mutate(partner.name = forcats::fct_relevel(partner.name, "Other", after = Inf))
+    mutate(sciname = forcats::fct_relevel(sciname, "Other", after = Inf))
   
   data %>%
     # Plot stacked line graph
