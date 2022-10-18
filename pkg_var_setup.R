@@ -23,6 +23,8 @@ region6_palette <- c(
   "#114F59" # dark teal
 )
 
+artis_palette <- colorRampPalette(region6_palette)
+
 owid_regions <- read.csv("/Volumes/jgephart/ARTIS/Outputs/exploreARTIS_files/owid_regions.csv")
 
 # Create centroids data frame - for map plot
