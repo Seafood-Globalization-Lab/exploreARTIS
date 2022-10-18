@@ -167,13 +167,15 @@ plot_partner_line <- function(data, trade_flow, prop_flow_cutoff = 0.05,
   
   # Bind stacked line graph data to grid so that zeroes can be filled in for "missing" years
   # Need to do this for time series to plot correctly
-  data %>%
+  data <- data %>%
     full_join(partner_year_grid, by = c("year", "partner")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
-    mutate(partner.name = fct_reorder(partner, quantity)) %>%
+    mutate(partner.name = fct_reorder(partner, quantity))
+  
+  data %>%
     ggplot() +
-    geom_line(aes(x = year, y = quantity, color = partner.name)) +
-    scale_fill_viridis_d() +
+    geom_line(aes(x = year, y = quantity, color = partner.name), size = 1.1) +
+    scale_color_manual(values = artis_palette(length(unique(data$partner.name)))) +
     labs(y = quantity.lab, x = "Year", title = plot.title, color = partner.lab) +
     theme_bw() 
 }

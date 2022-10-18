@@ -21,12 +21,12 @@
 #' @export
 
 plot_bar <- function(data, bar_group, species = NA, years = NA,
-                             producers = NA, exporters = NA, importers = NA,
-                             hs_codes = NA, prod_method = NA, prod_environment = NA,
-                             export_source = NA, 
-                             weight = "live", 
-                             fill_type = NA, top_n = 10, 
-                             plot.title = ""){
+                     producers = NA, exporters = NA, importers = NA,
+                     hs_codes = NA, prod_method = NA, prod_environment = NA,
+                     export_source = NA, 
+                     weight = "live", 
+                     fill_type = NA, top_n = 10, 
+                     plot.title = ""){
   # data should be an ARTIS data frame
   # of the total trade are lumped together as "Other"
   
@@ -85,7 +85,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       mutate(bar_group = fct_reorder(bar_group, quantity)) %>%
       # Creating Bar Chart
       ggplot(aes(x = quantity, y = bar_group)) +
-      geom_bar(stat = "identity") +
+      geom_bar(stat = "identity", fill = "#114F59") +
       labs(x = quantity.lab, y = "") +
       theme_bw()
   } else {
