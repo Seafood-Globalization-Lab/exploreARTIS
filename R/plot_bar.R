@@ -24,7 +24,8 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
                      producers = NA, exporters = NA, importers = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
                      export_source = NA, 
-                     weight = "live", 
+                     weight = "live",
+                     common_names = FALSE,
                      fill_type = NA, top_n = 10, 
                      plot.title = ""){
   # data should be an ARTIS data frame
@@ -45,7 +46,6 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   } else if (fill_type == "method") {
     fill_lab <- "Production Method"
   }
-  
   # Filter to data selection based on user input--------------------------------
   data <- data %>%
     {if (sum(is.na(species)) == 0)
@@ -90,6 +90,20 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
                 by = c("importer_iso3c" = "code")) %>%
       mutate(importer_iso3c = country_name) %>%
       select(-country_name)
+  } else if (bar_group == "sciname") {
+    
+    if (common_names == TRUE) {
+      data <- data %>%
+        left_join(sciname_metadata %>%
+                    select(sciname, common_name),
+                  by = c("sciname")) %>%
+        mutate(sciname = common_name) %>%
+        select(-common_name)
+    }
+    
+    # Format scinames for presentation
+    data <- data %>%
+      mutate(sciname = str_to_sentence(sciname))
   }
   
   # Factors for bar ordering----------------------------------------------------
