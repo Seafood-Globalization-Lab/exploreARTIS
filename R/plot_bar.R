@@ -68,7 +68,23 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       else .} %>%
     {if (sum(is.na(export_source)) == 0)
       filter(., dom_source %in% export_source)
-      else .} 
+      else .}
+  
+  if (bar_group == "exporter_iso3c") {
+    data <- data %>%
+      left_join(owid_regions %>%
+                  select(code, country_name),
+                by = c("exporter_iso3c" = "code")) %>%
+      mutate(exporter_iso3c = country_name) %>%
+      select(-country_name)
+  } else if (bar_group == "importer_iso3c") {
+    data <- data %>%
+      left_join(owid_regions %>%
+                  select(code, country_name),
+                by = c("importer_iso3c" = "code")) %>%
+      mutate(importer_iso3c = country_name) %>%
+      select(-country_name)
+  }
   
   # Bar Chart Creation----------------------------------------------------------
   
