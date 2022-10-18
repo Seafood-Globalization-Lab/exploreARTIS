@@ -12,12 +12,44 @@ library(circlize)
 library(ggsankey)
 library(ggpubr)
 
+
+con <- dbConnect(RPostgres::Postgres(),
+                 dbname=Sys.getenv("POSTGRES_DB"),
+                 host="localhost",
+                 port="5432",
+                 user=Sys.getenv("POSTGRES_USER"),
+                 password=Sys.getenv("POSTGRES_PASSWORD"))
+
+# Check that connection is established by checking which tables are present
+dbListTables(con)
+
+# Pull all ARTIS and production data
+artis <- dbGetQuery(con, "SELECT * FROM snet")
+
+
+artis <- artis %>%
+  select(-record_id) %>%
+  # Remove 2020 for now
+  filter(year < 2020)
+
+prod <- dbGetQuery(con, "SELECT * FROM production")
+prod <- prod %>%
+  select(-record_id) %>%
+  # Remove 2020 for now
+  filter(year < 2020)
+
+# Close database connection
+dbDisconnect(con)
+
+rm(list = c("con"))
+
 artis <- read.csv("data/sample_snet.csv")
 regional_artis <- read.csv("/Volumes/jgephart/ARTIS/Outputs/S_net/snet_20220928/regional_snet.csv")
 
 # Test regional sankey function-------------------------------------------------
 plot_regional_sankey_method_habitat(regional_artis, 1996, 2019)
 plot_regional_sankey_method_habitat(regional_artis, 2019, 2019)
+
 
 # Test plot_partner_line function-----------------------------------------------
 plot_partner_line(artis, trade_flow = "import", prop_flow_cutoff = 0.02)
@@ -101,10 +133,20 @@ plot_chord(artis, years = 2018, prod_method = "aquaculture", focal_country = "US
 
 plot_chord(artis, years = 2016, focal_country = c("USA", "CHN"))
 
+# Test plot_chord for region
+plot_chord(regional_artis, years = 2016, 
+           prod_method = "capture", prod_environment = "marine", plot_region = TRUE)
+
 # Testing calculate_supply
 supply <- calculate_supply(artis, prod)
 
-
+# Negative supply
+supply_negative_summary <- supply %>% 
+  group_by(iso3c, year) %>%
+  mutate(total_supply = sum(supply_domestic)) %>%
+  group_by(iso3c, sciname, year, total_supply) %>%
+  summarise(supply = sum(supply_domestic)) %>%
+  arrange(supply)
 
 
 
