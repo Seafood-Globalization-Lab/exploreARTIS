@@ -26,6 +26,7 @@ plot_species_line <- function(data, prop_flow_cutoff = 0.05,
                                  hs_codes = NA, prod_method = NA, prod_environment = NA,
                                  export_source = NA, 
                                  weight = "live",
+                                 common_names = FALSE,
                                  plot.title = ""){
 
   # Setting up parameters based on user input-----------------------------------
@@ -36,6 +37,15 @@ plot_species_line <- function(data, prop_flow_cutoff = 0.05,
   } else {
     quantity <- "product_weight_t"
     quantity.lab <- "Quantity (t product weight)"
+  }
+  
+  if (common_names == TRUE) {
+    data <- data %>%
+      left_join(sciname_metadata %>%
+                  select(sciname, common_name),
+                by = c("sciname")) %>%
+      mutate(sciname = common_name) %>%
+      select(-common_name)
   }
   
   # Filtering data based on user input------------------------------------------
@@ -83,6 +93,10 @@ plot_species_line <- function(data, prop_flow_cutoff = 0.05,
     group_by(year, sciname) %>%
     summarise(quantity = sum(quantity)) %>%
     ungroup()
+  
+  # Format scinames for presentation
+  data <- data %>%
+    mutate(sciname = str_to_sentence(sciname))
   
   # Create full list of partners and years 
   sciname_year_grid <- expand_grid(sciname = unique(data$sciname), 

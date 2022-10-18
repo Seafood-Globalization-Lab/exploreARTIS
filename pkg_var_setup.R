@@ -2,6 +2,9 @@
 library(tidyverse)
 library(CoordinateCleaner)
 
+rm(list = ls())
+gc()
+
 # Sector and link colors for focal ISO 
 iso_all_trade <- "black" 
 
@@ -26,6 +29,7 @@ region6_palette <- c(
 artis_palette <- colorRampPalette(region6_palette)
 
 owid_regions <- read.csv("/Volumes/jgephart/ARTIS/Outputs/exploreARTIS_files/owid_regions.csv")
+sciname_metadata <- read.csv("/Volumes/jgephart/ARTIS/Outputs/SQL_Database/20220928/sciname.csv")
 
 # Create centroids data frame - for map plot
 # FIXIT: Check Kiribati centroid spans east west - point showing up in the wrong place

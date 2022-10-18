@@ -25,6 +25,7 @@ plot_species_stacked <- function(data, prop_flow_cutoff = 0.05,
                                  hs_codes = NA, prod_method = NA, prod_environment = NA,
                                  export_source = NA, 
                                  weight = "live",
+                                 common_names = FALSE,
                                  plot.title = "") {
   
   # Setting up parameters based on user input-----------------------------------
@@ -34,6 +35,15 @@ plot_species_stacked <- function(data, prop_flow_cutoff = 0.05,
   }else{
     quantity <- "product_weight_t"
     quantity.lab <- "Quantity (t product weight)"
+  }
+  
+  if (common_names == TRUE) {
+    data <- data %>%
+      left_join(sciname_metadata %>%
+                  select(sciname, common_name),
+                by = c("sciname")) %>%
+      mutate(sciname = common_name) %>%
+      select(-common_name)
   }
   
   # Filtering data based on user input------------------------------------------
@@ -96,6 +106,10 @@ plot_species_stacked <- function(data, prop_flow_cutoff = 0.05,
     mutate(sciname = fct_reorder(sciname, quantity)) %>%
     # Reorder so that "Other" always last
     mutate(sciname = forcats::fct_relevel(sciname, "Other", after = Inf))
+  
+  # Format scinames for presentation
+  data <- data %>%
+    mutate(sciname = str_to_sentence(sciname))
   
   data %>%
     # Plot stacked line graph

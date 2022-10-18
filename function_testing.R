@@ -107,6 +107,7 @@ plot_species_line(artis, species = c("salmo salar", "thunnus albacares"))
 
 # Test plot_species_stacked function
 plot_species_stacked(artis)
+plot_species_stacked(artis, common_names = TRUE)
 
 plot_species_stacked(artis, species = c("salmo salar", "thunnus albacares"))
 
