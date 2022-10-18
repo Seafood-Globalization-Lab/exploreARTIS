@@ -17,6 +17,7 @@ plot_bar(
   prod_environment = NA,
   export_source = NA,
   weight = "live",
+  common_names = FALSE,
   fill_type = NA,
   top_n = 10,
   plot.title = ""

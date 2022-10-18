@@ -103,6 +103,7 @@ plot_partner_stacked(artis, trade_flow = "import", export_source = "foreign expo
 plot_partner_stacked(artis, trade_flow = "export", export_source = "foreign export")
 
 # Test plot_species_line function
+plot_species_line(artis, common_names = TRUE)
 plot_species_line(artis, species = c("salmo salar", "thunnus albacares"))
 
 # Test plot_species_stacked function

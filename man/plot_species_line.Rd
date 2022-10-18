@@ -17,6 +17,7 @@ plot_species_line(
   prod_environment = NA,
   export_source = NA,
   weight = "live",
+  common_names = FALSE,
   plot.title = ""
 )
 }

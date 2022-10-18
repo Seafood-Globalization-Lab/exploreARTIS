@@ -110,6 +110,7 @@ plot_species_line <- function(data, prop_flow_cutoff = 0.05,
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity)) %>%
     mutate(sciname = ifelse(is.na(sciname), "Other", sciname)) %>%
     mutate(sciname = fct_reorder(sciname, quantity)) %>%
+    mutate(sciname = str_to_sentence(sciname)) %>%
     # Reorder so that "Other" always last
     mutate(sciname = forcats::fct_relevel(sciname, "Other", after = Inf))
   
