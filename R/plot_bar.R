@@ -41,11 +41,14 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
     quantity.lab <- "Quantity (t product weight)"
   }
   
-  if (fill_type == "dom_source") {
-    fill_lab <- "Export Source"
-  } else if (fill_type == "method") {
-    fill_lab <- "Production Method"
+  if (!is.na(fill_type)) {
+    if (fill_type == "dom_source") {
+      fill_lab <- "Export Source"
+    } else if (fill_type == "method") {
+      fill_lab <- "Production Method"
+    }
   }
+  
   # Filter to data selection based on user input--------------------------------
   data <- data %>%
     {if (sum(is.na(species)) == 0)
