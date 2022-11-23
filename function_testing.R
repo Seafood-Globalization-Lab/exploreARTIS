@@ -43,12 +43,6 @@ dbDisconnect(con)
 
 rm(list = c("con"))
 
-artis <- read.csv("data/sample_snet.csv") %>%
-  mutate(hs6 = as.character(hs6)) %>%
-  mutate(hs6 = case_when(
-    str_length(hs6) == 5 ~ paste("0", hs6, sep = ""),
-    TRUE ~ hs6
-  ))
 regional_artis <- read.csv("/Volumes/jgephart/ARTIS/Outputs/S_net/snet_20220928/regional_snet.csv")
 
 # Test regional sankey function-------------------------------------------------
@@ -151,17 +145,22 @@ plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
 plot_bar(artis, bar_group = "sciname", fill_type = "dom_source")
 
 # Testing plot_chord
-plot_chord(artis, years = 2016)
-plot_chord(artis, years = 2000, prod_method = "capture", focal_country = "USA")
-plot_chord(artis, years = 2018, prod_method = "capture", focal_country = "USA")
-plot_chord(artis, years = 2000, prod_method = "aquaculture", focal_country = "USA")
-plot_chord(artis, years = 2018, prod_method = "aquaculture", focal_country = "USA")
+plot_chord(artis, years = 2016, region_colors = region7_palette)
+plot_chord(artis, years = 2000, prod_method = "capture", focal_country = "USA", 
+           region_colors = region7_palette)
+plot_chord(artis, years = 2018, prod_method = "capture", focal_country = "USA", 
+           region_colors = region7_palette)
+plot_chord(artis, years = 2000, prod_method = "aquaculture", focal_country = "USA", 
+           region_colors = region7_palette)
+plot_chord(artis, years = 2018, prod_method = "aquaculture", focal_country = "USA", 
+           region_colors = region7_palette)
 
-plot_chord(artis, years = 2016, focal_country = c("USA", "CHN"))
+plot_chord(artis, years = 2016, focal_country = c("USA", "CHN"), region_colors = region7_palette)
 
 # Test plot_chord for region
 plot_chord(regional_artis, years = 2016, 
-           prod_method = "capture", prod_environment = "marine", plot_region = TRUE)
+           prod_method = "capture", prod_environment = "marine", 
+           plot_region = TRUE, region_colors = region6_palette)
 
 # Testing calculate_supply
 supply <- calculate_supply(artis, prod)
