@@ -20,11 +20,12 @@
 #' @import tidyverse
 #' @import viridis
 #' @import rnaturalearth
+#' @import countrycode
 #' @importFrom ggthemes theme_map
 #' @export
 
 plot_map <- function(data,
-                     species = NA, years = NA,
+                     species = NA, years = NA, regions = NA,
                      producers = NA, exporters = NA, importers = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
                      export_source = NA, weight = "live",
@@ -97,6 +98,19 @@ plot_map <- function(data,
       rename("iso_a3" = paste(country_fill_col)) %>%
       right_join(world, by = "iso_a3")
     
+    # Summarizing by region if requested
+    if (!is.na(regions)) {
+      chloropleth_df <- chloropleth_df %>%
+        left_join(
+          owid_regions %>%
+            select(code, region),
+          by = c("iso_a3" = "code")
+        ) %>%
+        group_by(region) %>%
+        mutate(quantity = sum(quantity, na.rm = TRUE)) %>%
+        ungroup()
+    }
+    
     trade_map <- trade_map +
       geom_sf(data = chloropleth_df, 
               aes(fill = quantity, geometry = geometry), size = 0.1) +
@@ -112,11 +126,47 @@ plot_map <- function(data,
     flows_df <- data %>%
       group_by(importer_iso3c, exporter_iso3c) %>% 
       summarize(quantity = sum(.data[[quantity]], na.rm=TRUE)/1000000) %>%
-      ungroup() %>%
-      slice_max(n = n_flows, order_by = quantity) %>%
-      # Join with lat/long data for centroids
-      left_join(country_centroids, by = c("exporter_iso3c" = "iso3")) %>%
-      left_join(country_centroids, by = c("importer_iso3c" = "iso3")) 
+      ungroup()
+    
+    # Summarizing centroids by region if requested
+    if (!is.na(regions)) {
+      
+      flows_df <- flows_df %>%
+        left_join(
+          owid_regions %>%
+            select(code, exporter_region = region),
+          by = c("exporter_iso3c" = "code")
+        ) %>%
+        left_join(
+          owid_regions %>%
+            select(code, importer_region = region),
+          by = c("importer_iso3c" = "code")
+        ) %>%
+        # Remove NEI since NEI does not get classified into a region
+        filter(!is.na(exporter_region) & !is.na(importer_region)) %>%
+        # Join with lat/long data for centroids
+        left_join(country_centroids, by = c("exporter_iso3c" = "iso3")) %>%
+        left_join(country_centroids, by = c("importer_iso3c" = "iso3")) %>%
+        # Remove any countries that do not have centroids (SCG)
+        filter(!is.na(centroid.lon.x) & !is.na(centroid.lat.x) &
+                 !is.na(centroid.lon.y) & !is.na(centroid.lat.y)) %>%
+        group_by(exporter_region, importer_region) %>%
+        summarize(quantity = sum(quantity, na.rm = TRUE),
+                  centroid.lon.x = mean(centroid.lon.x),
+                  centroid.lat.x = mean(centroid.lat.x),
+                  centroid.lon.y = mean(centroid.lon.y),
+                  centroid.lat.y = mean(centroid.lat.y)) %>%
+        ungroup() %>%
+        slice_max(n = n_flows, order_by = quantity)
+      
+    } else {
+      
+      flows_df <- flows_df %>%
+        slice_max(n = n_flows, order_by = quantity) %>%
+        # Join with lat/long data for centroids
+        left_join(country_centroids, by = c("exporter_iso3c" = "iso3")) %>%
+        left_join(country_centroids, by = c("importer_iso3c" = "iso3"))
+    }
       
     
     trade_map <- trade_map +

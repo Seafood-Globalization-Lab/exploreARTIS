@@ -135,6 +135,11 @@ artis %>%
   filter(exporter_iso3c == "USA") %>%
   plot_map(country_fill = "import", flow_arrows = TRUE, n_flows = 10)
 
+# Testing mapping for regions
+artis %>%
+  plot_map(country_fill = "export", flow_arrows = TRUE, regions = TRUE)
+
+
 # Testing plot_bar
 plot_bar(artis, bar_group = "importer_iso3c")
 plot_bar(artis, bar_group = "importer_iso3c", fill_type = "method")
