@@ -80,21 +80,55 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
   #-----------------------------------------------------------------------------
   # Summarize data based on variable selected
   
-  # Special case for summarizing by country and region
-  if (artis_var == "partner") {
-    print("in partner data summarizing")
+  
+  # Special case for summarizing by region for trading partners
+  if (!is.na(regions)) {
     
-    # Check if regional summary is requested
+    if (regions == "owid") {
+      # Defaul regional definitions - Our World in Data
+      data <- convert_owid_regions(data)
+      
+    } else {
+      data <- data %>%
+        # Initial conversion from iso3c codes to regions
+        mutate(exporter_region = suppressWarnings(countrycode(exporter_iso3c, origin = "iso3c", destination = regions)),
+               importer_region = suppressWarnings(countrycode(importer_iso3c, origin = "iso3c", destination = regions))) %>%
+        # Cleaning up any NAs (ie Other nei)
+        mutate(
+          exporter_region = case_when(
+            is.na(exporter_region) ~ "Other",
+            TRUE ~ exporter_region),
+          importer_region = case_when(
+            is.na(importer_region) ~ "Other",
+            TRUE ~ importer_region
+          )
+        )
+    }
     
-  } else {
-    # Getting timeseries of data by variable selected
-    data <- data %>%
-      group_by(year, .data[[artis_var]]) %>%
-      summarize(quantity = sum(.data[[quantity]], na.rm = TRUE)) %>%
-      ungroup()
+    # Check if self loops need to be removed
+    if (region_self_loops == FALSE) {
+      data <- data %>%
+        filter(exporter_region != importer_region)
+    }
     
-    colnames(data) <- c("year", "variable", "quantity")
+    # variable set up for summary below
+    if (artis_var == "exporter_iso3c") {
+      data <- data %>%
+        rename("exporter_iso3c" = "exporter_region")
+    } else {
+      data <- data %>%
+        rename("importer_iso3c" = "importer_region")
+    }
   }
+  
+  
+  # Getting timeseries of data by variable selected
+  data <- data %>%
+    group_by(year, .data[[artis_var]]) %>%
+    summarize(quantity = sum(.data[[quantity]], na.rm = TRUE)) %>%
+    ungroup()
+  
+  colnames(data) <- c("year", "variable", "quantity")
   
   # Checking against prop_flow cutoff if necessary
   if (!is.na(prop_flow_cutoff)) {
@@ -110,10 +144,7 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
       # Re-summarize based on some categories turned to "Other"
       group_by(year, variable) %>%
       summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
-      ungroup() %>%
-      # Reorder so that "Other" always last
-      mutate(variable = fct_reorder(variable, quantity)) %>%
-      mutate(variable = forcats::fct_relevel(variable, "Other", after = Inf))
+      ungroup()
   }
   
   # Filling in missing values for any years with zeros
@@ -128,9 +159,35 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
   if (artis_var == "sciname") {
     # Format scinames for presentation
     data <- data %>%
-      mutate(variable = str_to_sentence(variable)) %>%
-      # Reorder so that "Other" always last
-      mutate(variable = fct_reorder(variable, quantity)) %>%
+      mutate(variable = str_to_sentence(variable))
+  }
+  
+  if ((artis_var == "exporter_iso3c" | artis_var == "importer_iso3c") & is.na(regions)) {
+    # Rename ISO 3 codes to country names
+    data <- data %>%
+      left_join(
+        owid_regions %>%
+          select(code, country_name),
+        by = c("variable" = code)
+      ) %>%
+      mutate(country_name = case_when(
+        is.na(country_name) ~ "Other",
+        TRUE ~ country_name
+      )) %>%
+      # Regroup if there are multiple "Other" countries
+      group_by(year, country_name) %>%
+      summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
+      ungroup() %>%
+      rename(variable = country_name)
+  }
+  
+  # Reorder (descending) based on quantity
+  data <- data %>%
+    mutate(variable = fct_reorder(variable, quantity))
+  
+  # Reorder so that "Other" always last
+  if ("Other" %in% unique(data$variable)) {
+    data <- data %>%
       mutate(variable = forcats::fct_relevel(variable, "Other", after = Inf))
   }
   
