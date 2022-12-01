@@ -84,6 +84,11 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
   if (artis_var == "partner") {
     print("in partner data summarizing")
     
+    # Check if regional summary is requested
+    
+  } else if (artis_var == "species") {
+    print("in sciname data summarizing")
+    
   } else {
     # Getting timeseries of data by variable selected
     data <- data %>%
@@ -92,17 +97,33 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
       ungroup()
     
     colnames(data) <- c("year", "variable", "quantity")
-    
-    # Filling in missing values for any years with zeros
-    year_grid <- expand_grid(year = unique(data$year), 
-                             variable = unique(data$variable))
-    
-    data <- data %>%
-      full_join(year_grid,
-                by = c("year", "variable")) %>%
-      mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity))
   }
   
+  # Checking against prop_flow cutoff if necessary
+  if (!is.na(prop_flow_cutoff)) {
+    data <- data %>%
+      group_by(year) %>%
+      mutate(annual = sum(quantity, na.rm = TRUE)) %>%
+      ungroup() %>%
+      mutate(prop = quantity / annual) %>%
+      mutate(variable = case_when(
+        prop < prop_flow_cutoff ~ "Other",
+        TRUE ~ variable
+      )) %>%
+      # Re-summarize based on some categories turned to "Other"
+      group_by(year, variable) %>%
+      summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
+      ungroup()
+  }
+  
+  # Filling in missing values for any years with zeros
+  year_grid <- expand_grid(year = unique(data$year), 
+                           variable = unique(data$variable))
+  
+  data <- data %>%
+    full_join(year_grid,
+              by = c("year", "variable")) %>%
+    mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity))
   
   #-----------------------------------------------------------------------------
   # Visualizing timeseries as line graphs
