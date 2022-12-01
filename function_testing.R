@@ -53,10 +53,14 @@ plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters", p
 plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters Stacked", prop_flow_cutoff = 0.05, plot.type = "stacked")
 plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporter Regions", regions = "owid")
 
+# Test sankey function----------------------------------------------------------
+plot_sankey(artis)
+plot_sankey(artis, regions = "owid")
+plot_sankey(artis, regions = "region23")
+
 # Test regional sankey function-------------------------------------------------
 plot_regional_sankey_method_habitat(regional_artis, 1996, 2019)
 plot_regional_sankey_method_habitat(regional_artis, 2019, 2019)
-
 
 # Test plot_partner_line function-----------------------------------------------
 plot_partner_line(artis, trade_flow = "import", prop_flow_cutoff = 0.05)
