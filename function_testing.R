@@ -45,6 +45,14 @@ rm(list = c("con"))
 
 regional_artis <- read.csv("/Volumes/jgephart/ARTIS/Outputs/S_net/snet_20220928/regional_snet.csv")
 
+# Test general line graph function----------------------------------------------
+plot_ts(artis, artis_var = "method", plot.title = "Testing Title 2")
+plot_ts(artis, artis_var = "hs6", plot.title = "Testing HS Products 2", prop_flow_cutoff = 0.05)
+plot_ts(artis, artis_var = "sciname", plot.title = "Testing HS Products 2", prop_flow_cutoff = 0.05)
+plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters", prop_flow_cutoff = 0.05)
+plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters Stacked", prop_flow_cutoff = 0.05, plot.type = "stacked")
+plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporter Regions", regions = "owid")
+
 # Test regional sankey function-------------------------------------------------
 plot_regional_sankey_method_habitat(regional_artis, 1996, 2019)
 plot_regional_sankey_method_habitat(regional_artis, 2019, 2019)

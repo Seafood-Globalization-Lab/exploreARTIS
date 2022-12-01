@@ -2,12 +2,13 @@
 #' @import countrycode
 #' @import viridis
 #' @export
-plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.05, 
+plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.05,
                       species = NA, years = NA, producers = NA, 
                       exporters = NA, importers = NA, regions = NA,
                       hs_codes = NA, prod_method = NA, prod_environment = NA,
                       export_source = NA, region_self_loops = TRUE,
                       weight = "live",
+                      plot.type = "line",
                       plot.title = "") {
   
   #-----------------------------------------------------------------------------
@@ -41,6 +42,10 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
     color.lab <- "Export Source"
   } else if (artis_var == "hs6") {
     color.lab <- "HS Product"
+  } else if (artis_var == "exporter_iso3c") {
+    color.lab <- "Exporters"
+  } else if (artis_var == "importer_iso3c") {
+    color.lab <- "Importers"
   } else {
     color.lab <- "Species / Species groups"
   }
@@ -168,7 +173,7 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
       left_join(
         owid_regions %>%
           select(code, country_name),
-        by = c("variable" = code)
+        by = c("variable" = "code")
       ) %>%
       mutate(country_name = case_when(
         is.na(country_name) ~ "Other",
@@ -194,10 +199,21 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
   #-----------------------------------------------------------------------------
   # Visualizing timeseries as line graphs
   
-  data %>%
-    ggplot(aes(x = year, y = quantity, color = variable)) +
-    geom_line(size = 1.1) +
-    scale_color_manual(values = artis_palette(length(unique(data$variable)))) +
-    labs(y = quantity.lab, x = "Year", title = plot.title, color = color.lab) +
-    theme_bw()
+  if (plot.type == "line") {
+    
+    data %>%
+      ggplot(aes(x = year, y = quantity, color = variable)) +
+      geom_line(size = 1.1) +
+      scale_color_manual(values = artis_palette(length(unique(data$variable)))) +
+      labs(y = quantity.lab, x = "Year", title = plot.title, color = color.lab) +
+      theme_bw()
+  } else {
+    data %>%
+      ggplot() +
+      geom_area(aes(x = year, y = quantity, fill = variable)) +
+      scale_fill_manual(values = artis_palette(length(unique(data$variable)))) +
+      labs(y = quantity.lab, x = "Year", title = plot.title, fill = color.lab) +
+      theme_bw() 
+  }
+  
 }
