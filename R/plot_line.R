@@ -86,9 +86,6 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
     
     # Check if regional summary is requested
     
-  } else if (artis_var == "species") {
-    print("in sciname data summarizing")
-    
   } else {
     # Getting timeseries of data by variable selected
     data <- data %>%
@@ -113,7 +110,10 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
       # Re-summarize based on some categories turned to "Other"
       group_by(year, variable) %>%
       summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
-      ungroup()
+      ungroup() %>%
+      # Reorder so that "Other" always last
+      mutate(variable = fct_reorder(variable, quantity)) %>%
+      mutate(variable = forcats::fct_relevel(variable, "Other", after = Inf))
   }
   
   # Filling in missing values for any years with zeros
@@ -124,6 +124,15 @@ plot_line <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 
     full_join(year_grid,
               by = c("year", "variable")) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity))
+  
+  if (artis_var == "sciname") {
+    # Format scinames for presentation
+    data <- data %>%
+      mutate(variable = str_to_sentence(variable)) %>%
+      # Reorder so that "Other" always last
+      mutate(variable = fct_reorder(variable, quantity)) %>%
+      mutate(variable = forcats::fct_relevel(variable, "Other", after = Inf))
+  }
   
   #-----------------------------------------------------------------------------
   # Visualizing timeseries as line graphs
