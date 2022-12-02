@@ -160,6 +160,9 @@ plot_bar(artis, bar_group = "sciname", fill_type = "method")
 plot_bar(artis, bar_group = "importer_iso3c", fill_type = "dom_source")
 plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
 plot_bar(artis, bar_group = "sciname", fill_type = "dom_source")
+plot_bar(artis, bar_group = "exporter_iso3c", regions = TRUE)
+plot_bar(artis, bar_group = "exporter_iso3c", regions = TRUE, fill_type = "dom_source")
+plot_bar(artis, bar_group = "importer_iso3c", regions = TRUE)
 
 # Testing plot_chord
 plot_chord(artis, years = 2016, region_colors = region7_palette)
