@@ -2,6 +2,7 @@
 
 export(calculate_supply)
 export(convert_owid_regions)
+export(filter_artis)
 export(plot_bar)
 export(plot_chord)
 export(plot_export_source_line)
