@@ -144,19 +144,21 @@ plot_map <- function(data,
         ) %>%
         # Remove NEI since NEI does not get classified into a region
         filter(!is.na(exporter_region) & !is.na(importer_region)) %>%
-        # Join with lat/long data for centroids
-        left_join(country_centroids, by = c("exporter_iso3c" = "iso3")) %>%
-        left_join(country_centroids, by = c("importer_iso3c" = "iso3")) %>%
-        # Remove any countries that do not have centroids (SCG)
-        filter(!is.na(centroid.lon.x) & !is.na(centroid.lat.x) &
-                 !is.na(centroid.lon.y) & !is.na(centroid.lat.y)) %>%
+        # Summarize by region
         group_by(exporter_region, importer_region) %>%
-        summarize(quantity = sum(quantity, na.rm = TRUE),
-                  centroid.lon.x = mean(centroid.lon.x),
-                  centroid.lat.x = mean(centroid.lat.x),
-                  centroid.lon.y = mean(centroid.lon.y),
-                  centroid.lat.y = mean(centroid.lat.y)) %>%
+        summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
         ungroup() %>%
+        # Remove regional self loops for arrows
+        filter(exporter_region != importer_region) %>%
+        # Get regional centroids
+        left_join(
+          owid_centroids,
+          by = c("exporter_region" = "region")
+        ) %>%
+        left_join(
+          owid_centroids,
+          by = c("importer_region" = "region")
+        ) %>%
         slice_max(n = n_flows, order_by = quantity)
       
     } else {

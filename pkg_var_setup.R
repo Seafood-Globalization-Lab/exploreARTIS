@@ -41,5 +41,21 @@ country_centroids <- countryref %>%
 
 countryref <- countryref
 
+# Calculate centroids for regions for OWID
+owid_centroids <- owid_regions %>%
+  # Selecting specific country centroids for regional centroids
+  filter(code == "USA" | # USA - North America
+           code == "BRA" | # Brazil - South America
+           code == "AUS" | # Australia - Oceania
+           code == "CHN" | # China - Asia
+           code == "DEU" | # Germany - Europe
+           code == "TCD" # Chad - Africa
+         ) %>%
+  left_join(
+    country_centroids,
+    by = c("code" = "iso3")
+  ) %>%
+  select(c(region, centroid.lon, centroid.lat))
+
 # Save all variables for later use by package
 save.image(file = "R/sysdata.rda")
