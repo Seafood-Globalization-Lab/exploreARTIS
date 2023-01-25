@@ -37,7 +37,7 @@ install.packages("sf")
 ### exploreARTIS Package installation
 You can install this package with the devtools package. The first time you do it you will have to run 
 ```r 
-install.package("devtools")
+install.packages("devtools")
 library(devtools)
 ```
 
