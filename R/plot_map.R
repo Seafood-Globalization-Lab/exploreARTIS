@@ -29,7 +29,7 @@ plot_map <- function(data,
                      producers = NA, exporters = NA, importers = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
                      export_source = NA, weight = "live",
-                     country_fill = NA, flow_arrows = FALSE, n_flows = 10){
+                     country_fill = NA, flow_arrows = FALSE, n_flows = 10, arrow_label = NA, fill_label = NA){
   
   # Select live or product weight
   if(weight == "live"){
@@ -40,6 +40,9 @@ plot_map <- function(data,
     quantity.lab <- "(million t product weight)"
   }
   
+  quantity <- weight
+  #quantity.lab <- quantity_label
+  
   # Filter to data selection
   data <- filter_artis(data, species, years, producers, exporters, importers,
                        hs_codes, prod_method, prod_environment, export_source)
@@ -49,28 +52,51 @@ plot_map <- function(data,
     filter(iso_a3 != "ATA")
   
   # Change projection
-  PROJ <- "+proj=eck4 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
-  #world <- st_transform(world, PROJ)
+  # PROJ <- "+proj=eck4 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
+  # world <- st_transform(world, PROJ)
   
-  trade_map <- ggplot(world) +
-    geom_sf(size = 0.1) 
+  if (!is.na(regions)) {
+    world <- world %>%
+      left_join(
+        owid_regions %>%
+          select(code, region),
+        by = c("iso_a3" = "code")
+      ) %>%
+      group_by(region) %>%
+      summarize(geometry = sf::st_combine(geometry)) %>%
+      ungroup() %>%
+      mutate(geometry = sf::st_union(geometry))
+      
+  }
+  
+  if (is.na(country_fill)) {
+    trade_map <- ggplot(world) +
+      geom_sf(size = 0.1, color = "white", fill = "#97acb7", alpha = 1)
+  } else {
+    trade_map <- ggplot(world) +
+      geom_sf(size = 0.1, color = "white", fill = "grey", alpha = 0.5)
+  }
+  
+  
+  
     # FIX IT: Projection is not being applied for some reason
     #coord_sf(crs = PROJ) 
   
   # If country_fill is provided, create import or export value to fill by
   if(is.na(country_fill) == FALSE){
     # Set column for fill color
-    if(country_fill == "import"){
-      country_fill_col <- "importer_iso3c"
-    }else{
-      country_fill_col <- "exporter_iso3c"
-    }
+    # if(country_fill == "import"){
+    #   country_fill_col <- "importer_iso3c"
+    # }else{
+    #   country_fill_col <- "exporter_iso3c"
+    # }
+    country_fill_col <- country_fill
+    
     # Summarize total export or import data
     chloropleth_df <- data %>%
       group_by(.data[[country_fill_col]]) %>% 
       summarize(quantity = sum(.data[[quantity]], na.rm=TRUE)/1000000) %>%
-      rename("iso_a3" = paste(country_fill_col)) %>%
-      right_join(world, by = "iso_a3")
+      rename("iso_a3" = paste(country_fill_col))
     
     # Summarizing by region if requested
     if (!is.na(regions)) {
@@ -80,16 +106,23 @@ plot_map <- function(data,
             select(code, region),
           by = c("iso_a3" = "code")
         ) %>%
-        group_by(region) %>%
-        mutate(quantity = sum(quantity, na.rm = TRUE)) %>%
-        ungroup()
+        filter(!is.na(region))# %>%
+        # group_by(region) %>%
+        # summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
+        # ungroup() %>%
+        # left_join(world, by = "region")
+      
+    } else {
+      chloropleth_df <- chloropleth_df %>%
+        left_join(world, by = "iso_a3")
     }
     
     trade_map <- trade_map +
       geom_sf(data = chloropleth_df, 
-              aes(fill = quantity, geometry = geometry), size = 0.1) +
+              aes(fill = quantity, geometry = geometry), color = "white", size = 0.1) +
       scale_fill_gradient(low = "#86ADA7", high = "#0F2D59") +
-      labs(fill = paste("Total ", country_fill, " \n", quantity.lab, sep = ""))
+      labs(fill = fill_label)
+      #labs(fill = paste("Total ", country_fill, " \n", quantity.lab, sep = ""))
     
   }else{
     trade_map <- trade_map
@@ -149,13 +182,14 @@ plot_map <- function(data,
       geom_curve(data = flows_df, 
                  aes(x = centroid.lon.x, y = centroid.lat.x, 
                      xend = centroid.lon.y, yend = centroid.lat.y,
-                     size = quantity/max(quantity),
                      color = quantity),
-                 alpha = 0.75, 
-                 curvature = -0.2, arrow = arrow(length = unit(0.05, "npc"), type = "closed")) +
+                 size = 1,
+                 alpha = 0.75,
+                 curvature = -0.35, arrow = arrow(length = unit(3, "mm"), angle = 20)) +
       scale_colour_gradient(low = "#F7AF75", high = "#E24027") +
-      scale_size_continuous(range = c(1, 3)) +
-      labs(color = paste("Export\n", quantity.lab, sep = ""))
+      labs(color = arrow_label)
+      #scale_size_continuous(range = c(1, 3)) +
+      #labs(color = paste("Export\n", quantity.lab, sep = ""))
   }
   
   trade_map <- trade_map + 
