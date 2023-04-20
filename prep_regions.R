@@ -11,7 +11,14 @@ owid_regions <- owid_regions %>%
   filter(!is.na(country_name)) %>%
   select(Code, country_name, Continent) %>%
   distinct() %>%
-  rename(region = Continent)
+  rename(region = Continent) %>%
+  bind_rows(
+    data.frame(
+      Code = c("SCG"),
+      country_name = c("Serbia and Montenegro"),
+      region = c("Europe")
+    )
+  )
 
 # All column names lower case
 names(owid_regions) <- tolower(names(owid_regions))

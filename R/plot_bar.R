@@ -23,7 +23,8 @@
 plot_bar <- function(data, bar_group, species = NA, years = NA,
                      producers = NA, exporters = NA, importers = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
-                     export_source = NA, 
+                     export_source = NA,
+                     regions = NA,
                      weight = "live",
                      common_names = FALSE,
                      fill_type = NA, top_n = 10, 
@@ -33,10 +34,10 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   
   # Setting up parameters based on user input-----------------------------------
   # Select live or product weight
-  if(weight == "live"){
+  if (weight == "live") {
     quantity <- "live_weight_t"
     quantity.lab <- "Quantity (t live weight)"
-  }else{
+  } else {
     quantity <- "product_weight_t"
     quantity.lab <- "Quantity (t product weight)"
   }
@@ -50,64 +51,58 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   }
   
   # Filter to data selection based on user input--------------------------------
-  data <- data %>%
-    {if (sum(is.na(species)) == 0)
-      filter(., sciname %in% species)
-      else .} %>%
-    {if (sum(is.na(years)) == 0)
-      filter(., year %in% years)
-      else .} %>%
-    {if (sum(is.na(producers)) == 0)
-      filter(., source_country_iso3c %in% producers)
-      else .} %>%
-    {if (sum(is.na(exporters)) == 0)
-      filter(., exporter_iso3c %in% exporters)
-      else .} %>%
-    {if (sum(is.na(importers)) == 0)
-      filter(., importer_iso3c %in% importers)
-      else .} %>%
-    {if (sum(is.na(hs_codes)) == 0)
-      filter(., hs6 %in% as.character(as.numeric(hs_codes)))
-      else .} %>%
-    {if (sum(is.na(prod_method)) == 0)
-      filter(., method %in% prod_method)
-      else .} %>%
-    {if (sum(is.na(prod_environment)) == 0)
-      filter(., habitat %in% prod_environment)
-      else .} %>%
-    {if (sum(is.na(export_source)) == 0)
-      filter(., dom_source %in% export_source)
-      else .}
+  data <- filter_artis(data, species, years, producers, exporters, importers,
+                       hs_codes, prod_method, prod_environment, export_source)
   
-  if (bar_group == "exporter_iso3c") {
-    data <- data %>%
-      left_join(owid_regions %>%
-                  select(code, country_name),
-                by = c("exporter_iso3c" = "code")) %>%
-      mutate(exporter_iso3c = country_name) %>%
-      select(-country_name)
-  } else if (bar_group == "importer_iso3c") {
-    data <- data %>%
-      left_join(owid_regions %>%
-                  select(code, country_name),
-                by = c("importer_iso3c" = "code")) %>%
-      mutate(importer_iso3c = country_name) %>%
-      select(-country_name)
-  } else if (bar_group == "sciname") {
+  
+  data <- data %>%
+    rename("bar_group" = .data[[bar_group]])
+  
+  # Adding country names or regional names
+  if (bar_group == "exporter_iso3c" | bar_group == "importer_iso3c") {
+    if (is.na(regions)) {
+      data <- data %>%
+        left_join(
+          owid_regions %>%
+            select(code, country_name),
+          by = c("bar_group" = "code")
+        ) %>%
+        mutate(bar_group = country_name) %>%
+        select(-country_name)
+      
+    } else {
+      data <- data %>%
+        left_join(
+          owid_regions %>%
+            select(code, region),
+          by = c("bar_group" = "code")
+        ) %>%
+        mutate(region = case_when(
+          bar_group == "NEI" ~ "Other",
+          TRUE ~ region
+        )) %>%
+        mutate(bar_group = region) %>%
+        select(-region)
+    }
+  }
+  
+  # Formatting and name cleaning for scinames
+  if (bar_group == "sciname") {
     
     if (common_names == TRUE) {
       data <- data %>%
         left_join(sciname_metadata %>%
                     select(sciname, common_name),
-                  by = c("sciname")) %>%
-        mutate(sciname = common_name) %>%
+                  by = c("bar_group" = "sciname")) %>%
+        mutate(bar_group = common_name) %>%
         select(-common_name)
     }
     
     # Format scinames for presentation
     data <- data %>%
-      mutate(sciname = str_to_sentence(sciname))
+      mutate(bar_group = str_to_sentence(bar_group))
   }
+  
   
   # Factors for bar ordering----------------------------------------------------
   data$dom_source <- factor(data$dom_source,
@@ -122,12 +117,11 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
     # Bar chart with no stacking "fill" group
     data %>% 
       # Summarizing data based on column for bars "bar group"
-      group_by(.data[[bar_group]]) %>%
+      group_by(bar_group) %>%
       summarise(quantity = sum(.data[[quantity]], na.rm=TRUE)) %>%
       ungroup() %>%
       # Getting top n values
       slice_max(order_by = quantity, n = top_n) %>%
-      rename("bar_group" = .data[[bar_group]]) %>%
       mutate(bar_group = fct_reorder(bar_group, quantity)) %>%
       # Creating Bar Chart
       ggplot(aes(x = quantity, y = bar_group)) +
@@ -139,7 +133,6 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
     
     # Getting a list of top n bars
     top_n_list <- data %>%
-      rename("bar_group" = .data[[bar_group]]) %>%
       group_by(bar_group) %>%
       summarise(total_quantity = sum(.data[[quantity]], na.rm=TRUE)) %>%
       ungroup() %>%
@@ -147,8 +140,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
     
     # Getting data for the top n bars
     top_n_list %>% 
-      left_join(data %>% 
-                  rename("bar_group" = .data[[bar_group]]), 
+      left_join(data, 
                 by = "bar_group") %>% 
       mutate(bar_group = fct_reorder(bar_group, total_quantity)) %>%
       group_by(bar_group, .data[[fill_type]]) %>%

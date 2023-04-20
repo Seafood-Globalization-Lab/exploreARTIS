@@ -20,16 +20,18 @@
 #' @import tidyverse
 #' @import viridis
 #' @import rnaturalearth
+#' @import countrycode
 #' @importFrom ggthemes theme_map
 #' @export
 
 plot_map <- function(data,
-                     species = NA, years = NA,
+                     species = NA, years = NA, regions = NA,
                      producers = NA, exporters = NA, importers = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
                      export_source = NA, weight = "live",
-                     country_fill = NA, flow_arrows = FALSE, n_flows = 10,
-                     plot_region = FALSE){
+                     country_fill = NA, flow_arrows = FALSE, n_flows = 10, plot_region = FALSE,
+                     arrow_label = NA, fill_label = NA){
+
   
   # Select live or product weight
   if(weight == "live"){
@@ -40,69 +42,89 @@ plot_map <- function(data,
     quantity.lab <- "(million t product weight)"
   }
   
+  quantity <- weight
+  #quantity.lab <- quantity_label
+  
   # Filter to data selection
-  data <- data %>%
-    {if (sum(is.na(species)) == 0)
-      filter(., sciname %in% species)
-      else .} %>%
-    {if (sum(is.na(years)) == 0)
-      filter(., year %in% years)
-      else .} %>%
-    {if (sum(is.na(producers)) == 0)
-      filter(., source_country_iso3c %in% producers)
-      else .} %>%
-    {if (sum(is.na(exporters)) == 0)
-      filter(., exporter_iso3c %in% exporters)
-      else .} %>%
-    {if (sum(is.na(importers)) == 0)
-      filter(., importer_iso3c %in% importers)
-      else .} %>%
-    {if (sum(is.na(hs_codes)) == 0)
-      filter(., hs6 %in% as.character(as.numeric(hs_codes)))
-      else .} %>%
-    {if (sum(is.na(prod_method)) == 0)
-      filter(., method %in% prod_method)
-      else .} %>%
-    {if (sum(is.na(prod_environment)) == 0)
-      filter(., environment %in% prod_environment)
-      else .} %>%
-    {if (sum(is.na(export_source)) == 0)
-      filter(., dom_source %in% export_source)
-      else .} 
+  data <- filter_artis(data, species, years, producers, exporters, importers,
+                       hs_codes, prod_method, prod_environment, export_source)
   
   # Load world map data
   world <- ne_countries(scale = "medium", returnclass = "sf") %>%
     filter(iso_a3 != "ATA")
   
   # Change projection
-  PROJ <- "+proj=eck4 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
-  #world <- st_transform(world, PROJ)
+  # PROJ <- "+proj=eck4 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
+  # world <- st_transform(world, PROJ)
   
-  trade_map <- ggplot(world) +
-    geom_sf(size = 0.1) 
+  if (!is.na(regions)) {
+    world <- world %>%
+      left_join(
+        owid_regions %>%
+          select(code, region),
+        by = c("iso_a3" = "code")
+      ) %>%
+      group_by(region) %>%
+      summarize(geometry = sf::st_combine(geometry)) %>%
+      ungroup() %>%
+      mutate(geometry = sf::st_union(geometry))
+      
+  }
+  
+  if (is.na(country_fill)) {
+    trade_map <- ggplot(world) +
+      geom_sf(size = 0.1, color = "white", fill = "#97acb7", alpha = 1)
+  } else {
+    trade_map <- ggplot(world) +
+      geom_sf(size = 0.1, color = "white", fill = "grey", alpha = 0.5)
+  }
+  
+  
+  
     # FIX IT: Projection is not being applied for some reason
     #coord_sf(crs = PROJ) 
   
   # If country_fill is provided, create import or export value to fill by
   if(is.na(country_fill) == FALSE){
     # Set column for fill color
-    if(country_fill == "import"){
-      country_fill_col <- "importer_iso3c"
-    }else{
-      country_fill_col <- "exporter_iso3c"
-    }
+    # if(country_fill == "import"){
+    #   country_fill_col <- "importer_iso3c"
+    # }else{
+    #   country_fill_col <- "exporter_iso3c"
+    # }
+    country_fill_col <- country_fill
+    
     # Summarize total export or import data
     chloropleth_df <- data %>%
       group_by(.data[[country_fill_col]]) %>% 
       summarize(quantity = sum(.data[[quantity]], na.rm=TRUE)/1000000) %>%
-      rename("iso_a3" = paste(country_fill_col)) %>%
-      right_join(world, by = "iso_a3")
+      rename("iso_a3" = paste(country_fill_col))
+    
+    # Summarizing by region if requested
+    if (!is.na(regions)) {
+      chloropleth_df <- chloropleth_df %>%
+        left_join(
+          owid_regions %>%
+            select(code, region),
+          by = c("iso_a3" = "code")
+        ) %>%
+        filter(!is.na(region))# %>%
+        # group_by(region) %>%
+        # summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
+        # ungroup() %>%
+        # left_join(world, by = "region")
+      
+    } else {
+      chloropleth_df <- chloropleth_df %>%
+        left_join(world, by = "iso_a3")
+    }
     
     trade_map <- trade_map +
       geom_sf(data = chloropleth_df, 
-              aes(fill = quantity, geometry = geometry), size = 0.1) +
+              aes(fill = quantity, geometry = geometry), color = "white", size = 0.1) +
       scale_fill_gradient(low = "#86ADA7", high = "#0F2D59") +
-      labs(fill = paste("Total ", country_fill, " \n", quantity.lab, sep = ""))
+      labs(fill = fill_label)
+      #labs(fill = paste("Total ", country_fill, " \n", quantity.lab, sep = ""))
     
   }else{
     trade_map <- trade_map
@@ -113,24 +135,63 @@ plot_map <- function(data,
     flows_df <- data %>%
       group_by(importer_iso3c, exporter_iso3c) %>% 
       summarize(quantity = sum(.data[[quantity]], na.rm=TRUE)/1000000) %>%
-      ungroup() %>%
-      slice_max(n = n_flows, order_by = quantity) %>%
-      # Join with lat/long data for centroids
-      left_join(country_centroids, by = c("exporter_iso3c" = "iso3")) %>%
-      left_join(country_centroids, by = c("importer_iso3c" = "iso3")) 
+      ungroup()
+    
+    # Summarizing centroids by region if requested
+    if (!is.na(regions)) {
+      
+      flows_df <- flows_df %>%
+        left_join(
+          owid_regions %>%
+            select(code, exporter_region = region),
+          by = c("exporter_iso3c" = "code")
+        ) %>%
+        left_join(
+          owid_regions %>%
+            select(code, importer_region = region),
+          by = c("importer_iso3c" = "code")
+        ) %>%
+        # Remove NEI since NEI does not get classified into a region
+        filter(!is.na(exporter_region) & !is.na(importer_region)) %>%
+        # Summarize by region
+        group_by(exporter_region, importer_region) %>%
+        summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
+        ungroup() %>%
+        # Remove regional self loops for arrows
+        filter(exporter_region != importer_region) %>%
+        # Get regional centroids
+        left_join(
+          owid_centroids,
+          by = c("exporter_region" = "region")
+        ) %>%
+        left_join(
+          owid_centroids,
+          by = c("importer_region" = "region")
+        ) %>%
+        slice_max(n = n_flows, order_by = quantity)
+      
+    } else {
+      
+      flows_df <- flows_df %>%
+        slice_max(n = n_flows, order_by = quantity) %>%
+        # Join with lat/long data for centroids
+        left_join(country_centroids, by = c("exporter_iso3c" = "iso3")) %>%
+        left_join(country_centroids, by = c("importer_iso3c" = "iso3"))
+    }
       
     
     trade_map <- trade_map +
       geom_curve(data = flows_df, 
                  aes(x = centroid.lon.x, y = centroid.lat.x, 
                      xend = centroid.lon.y, yend = centroid.lat.y,
-                     size = quantity/max(quantity),
                      color = quantity),
-                 alpha = 0.75, 
-                 curvature = -0.2, arrow = arrow(length = unit(0.05, "npc"), type = "closed")) +
+                 size = 1,
+                 alpha = 0.75,
+                 curvature = -0.35, arrow = arrow(length = unit(3, "mm"), angle = 20)) +
       scale_colour_gradient(low = "#F7AF75", high = "#E24027") +
-      scale_size_continuous(range = c(1, 3)) +
-      labs(color = paste("Export\n", quantity.lab, sep = ""))
+      labs(color = arrow_label)
+      #scale_size_continuous(range = c(1, 3)) +
+      #labs(color = paste("Export\n", quantity.lab, sep = ""))
   }
   
   trade_map <- trade_map + 

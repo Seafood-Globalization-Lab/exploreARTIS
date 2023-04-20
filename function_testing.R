@@ -45,10 +45,22 @@ rm(list = c("con"))
 
 regional_artis <- read.csv("/Volumes/jgephart/ARTIS/Outputs/S_net/snet_20220928/regional_snet.csv")
 
+# Test general line graph function----------------------------------------------
+plot_ts(artis, artis_var = "method", plot.title = "Testing Title 2")
+plot_ts(artis, artis_var = "hs6", plot.title = "Testing HS Products 2", prop_flow_cutoff = 0.05)
+plot_ts(artis, artis_var = "sciname", plot.title = "Testing HS Products 2", prop_flow_cutoff = 0.05)
+plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters", prop_flow_cutoff = 0.05)
+plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters Stacked", prop_flow_cutoff = 0.05, plot.type = "stacked")
+plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporter Regions", regions = "owid")
+
+# Test sankey function----------------------------------------------------------
+plot_sankey(artis)
+plot_sankey(artis, regions = "owid")
+plot_sankey(artis, regions = "region23")
+
 # Test regional sankey function-------------------------------------------------
 plot_regional_sankey_method_habitat(regional_artis, 1996, 2019)
 plot_regional_sankey_method_habitat(regional_artis, 2019, 2019)
-
 
 # Test plot_partner_line function-----------------------------------------------
 plot_partner_line(artis, trade_flow = "import", prop_flow_cutoff = 0.05)
@@ -135,6 +147,11 @@ artis %>%
   filter(exporter_iso3c == "USA") %>%
   plot_map(country_fill = "import", flow_arrows = TRUE, n_flows = 10)
 
+# Testing mapping for regions
+artis %>%
+  plot_map(country_fill = "export", flow_arrows = TRUE, regions = TRUE)
+
+
 # Testing plot_bar
 plot_bar(artis, bar_group = "importer_iso3c")
 plot_bar(artis, bar_group = "importer_iso3c", fill_type = "method")
@@ -143,6 +160,9 @@ plot_bar(artis, bar_group = "sciname", fill_type = "method")
 plot_bar(artis, bar_group = "importer_iso3c", fill_type = "dom_source")
 plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
 plot_bar(artis, bar_group = "sciname", fill_type = "dom_source")
+plot_bar(artis, bar_group = "exporter_iso3c", regions = TRUE)
+plot_bar(artis, bar_group = "exporter_iso3c", regions = TRUE, fill_type = "dom_source")
+plot_bar(artis, bar_group = "importer_iso3c", regions = TRUE)
 
 # Testing plot_chord
 plot_chord(artis, years = 2016, region_colors = region7_palette)
