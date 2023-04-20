@@ -28,7 +28,8 @@ plot_map <- function(data,
                      producers = NA, exporters = NA, importers = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
                      export_source = NA, weight = "live",
-                     country_fill = NA, flow_arrows = FALSE, n_flows = 10){
+                     country_fill = NA, flow_arrows = FALSE, n_flows = 10,
+                     plot_region = FALSE){
   
   # Select live or product weight
   if(weight == "live"){
