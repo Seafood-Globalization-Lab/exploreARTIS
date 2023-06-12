@@ -29,7 +29,8 @@ plot_map <- function(data,
                      producers = NA, exporters = NA, importers = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
                      export_source = NA, weight = "live",
-                     country_fill = NA, flow_arrows = FALSE, n_flows = 10, arrow_label = NA, fill_label = NA){
+                     country_fill = NA, flow_arrows = FALSE, n_flows = 10,
+                     arrow_label = NA, fill_label = NA, caption_label = NA){
   
   # Select live or product weight
   if(weight == "live"){
@@ -39,9 +40,6 @@ plot_map <- function(data,
     quantity <- "product_weight_t"
     quantity.lab <- "(million t product weight)"
   }
-  
-  quantity <- weight
-  #quantity.lab <- quantity_label
   
   # Filter to data selection
   data <- filter_artis(data, species, years, producers, exporters, importers,
@@ -55,19 +53,19 @@ plot_map <- function(data,
   # PROJ <- "+proj=eck4 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" 
   # world <- st_transform(world, PROJ)
   
-  if (!is.na(regions)) {
-    world <- world %>%
-      left_join(
-        owid_regions %>%
-          select(code, region),
-        by = c("iso_a3" = "code")
-      ) %>%
-      group_by(region) %>%
-      summarize(geometry = sf::st_combine(geometry)) %>%
-      ungroup() %>%
-      mutate(geometry = sf::st_union(geometry))
-      
-  }
+  # if (!is.na(regions)) {
+  #   world <- world %>%
+  #     left_join(
+  #       owid_regions %>%
+  #         select(code, region),
+  #       by = c("iso_a3" = "code")
+  #     ) %>%
+  #     group_by(region) %>%
+  #     summarize(geometry = sf::st_combine(geometry)) %>%
+  #     ungroup() %>%
+  #     mutate(geometry = sf::st_union(geometry))
+  #     
+  # }
   
   if (is.na(country_fill)) {
     trade_map <- ggplot(world) +
@@ -106,11 +104,11 @@ plot_map <- function(data,
             select(code, region),
           by = c("iso_a3" = "code")
         ) %>%
-        filter(!is.na(region))# %>%
-        # group_by(region) %>%
-        # summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
-        # ungroup() %>%
-        # left_join(world, by = "region")
+        filter(!is.na(region)) %>%
+        group_by(region) %>%
+        mutate(quantity = sum(quantity, na.rm = TRUE)) %>%
+        ungroup() %>%
+        left_join(world, by = "iso_a3")
       
     } else {
       chloropleth_df <- chloropleth_df %>%
@@ -175,8 +173,17 @@ plot_map <- function(data,
         # Join with lat/long data for centroids
         left_join(country_centroids, by = c("exporter_iso3c" = "iso3")) %>%
         left_join(country_centroids, by = c("importer_iso3c" = "iso3"))
-    }
       
+      flows_df <- flows_df %>%
+        mutate(
+          centroid.lat.x = case_when(
+            exporter_iso3c %in% c("USA", "CHN", "RUS") ~ 1.05 * centroid.lat.x,
+            TRUE ~ centroid.lat.x),
+          centroid.lat.y = case_when(
+            importer_iso3c %in% c("USA", "CHN", "RUS") ~ 0.95 * centroid.lat.y,
+            TRUE ~ centroid.lat.y
+          ))
+    }
     
     trade_map <- trade_map +
       geom_curve(data = flows_df, 
@@ -188,17 +195,21 @@ plot_map <- function(data,
                  curvature = -0.35, arrow = arrow(length = unit(3, "mm"), angle = 20)) +
       scale_colour_gradient(low = "#F7AF75", high = "#E24027") +
       labs(color = arrow_label)
-      #scale_size_continuous(range = c(1, 3)) +
-      #labs(color = paste("Export\n", quantity.lab, sep = ""))
   }
   
   trade_map <- trade_map + 
     theme_map() + 
-    theme(legend.position = "bottom", legend.box="vertical", 
+    theme(legend.position = "bottom", legend.box="vertical", plot.background = element_rect(fill = "white"),
           legend.margin=margin(), legend.text = element_text(size=10),
           legend.title = element_text(size=11)) +
     guides(size = "none", fill = guide_colorbar(barwidth = 10, barheight = 0.75), 
            color = guide_colorbar(barwidth = 10, barheight = 0.75))
+  
+  if (!is.na(caption_label)) {
+    trade_map <- trade_map +
+      labs(caption = caption_label) +
+      theme(plot.caption = element_text(face = "italic"))
+  }
     
   return(trade_map)
 }

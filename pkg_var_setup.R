@@ -37,7 +37,18 @@ country_centroids <- countryref %>%
   filter(str_count(as.character(adm1_code))==3) %>%
   group_by(iso3) %>%
   summarise(centroid.lon = mean(centroid.lon),
-            centroid.lat = mean(centroid.lat))
+            centroid.lat = mean(centroid.lat)) %>%
+  ungroup() %>%
+  mutate(
+    centroid.lon = case_when(
+      iso3 == "KIR" ~ 172.9717,
+      TRUE ~ centroid.lon
+    ),
+    centroid.lat = case_when(
+      iso3 == "KIR" ~ 1.4518,
+      TRUE ~ centroid.lat
+    )
+  )
 
 countryref <- countryref
 
