@@ -200,6 +200,8 @@ plot_sankey <- function(data, prop_flow_cutoff = 0.05, regions = NA,
     # Tranforming into ggsankey format (x, node, next_x, next_node)
     make_long(producer, exporter, importer, value = total_q)
   
+  num_nodes <- length(unique(c(sankey_df$x, sankey_df$node, sankey_df$next_x, sankey_df$next_node)))
+  
   # Visualizing sankey diagram--------------------------------------------------
   sankey_df %>%
     ggplot(aes(x = x, 
@@ -212,6 +214,7 @@ plot_sankey <- function(data, prop_flow_cutoff = 0.05, regions = NA,
     geom_sankey(flow.alpha = 0.6) +
     geom_sankey_label(size = 3, color = "white", fill = "gray40") +
     theme_sankey(base_size = 18) +
+    scale_fill_manual(values = artis_palette(num_nodes)) + 
     labs(x = NULL) +
     theme(
       legend.position = "none",
