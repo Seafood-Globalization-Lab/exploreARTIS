@@ -200,7 +200,7 @@ plot_sankey <- function(data, prop_flow_cutoff = 0.05, regions = NA,
     # Tranforming into ggsankey format (x, node, next_x, next_node)
     make_long(producer, exporter, importer, value = total_q)
   
-  num_nodes <- length(unique(c(sankey_df$x, sankey_df$node, sankey_df$next_x, sankey_df$next_node)))
+  num_nodes <- length(unique(c(sankey_df$node,sankey_df$next_node)))
   
   # Visualizing sankey diagram--------------------------------------------------
   sankey_df %>%
