@@ -2,7 +2,9 @@
 
 export(calculate_supply)
 export(convert_owid_regions)
+export(create_summary_consumption)
 export(filter_artis)
+export(limit_per_capita_consumption)
 export(plot_bar)
 export(plot_chord)
 export(plot_export_source_line)
