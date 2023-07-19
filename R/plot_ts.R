@@ -7,9 +7,14 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
                       exporters = NA, importers = NA, regions = NA,
                       hs_codes = NA, prod_method = NA, prod_environment = NA,
                       export_source = NA, region_self_loops = TRUE,
-                      weight = "live",
+                      weight = "live", facet_variable = NA, facet_values = NA,
                       plot.type = "line",
                       plot.title = "") {
+  
+  if (artis_var == facet_variable) {
+    warning("artis_var cannot be the same as facet_variable")
+    return(NULL)
+  }
   
   #-----------------------------------------------------------------------------
   # Initial variable setup
@@ -100,39 +105,96 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
     }
   }
   
+  grouping_cols <- c("year", artis_var)
+  
+  if (!is.na(facet_variable)) {
+    grouping_cols <- c(grouping_cols, facet_variable)
+  }
+  
   
   # Getting timeseries of data by variable selected
   data <- data %>%
-    group_by(year, .data[[artis_var]]) %>%
+    # group_by(year, .data[[artis_var]]) %>%
+    group_by(across(grouping_cols)) %>%
     summarize(quantity = sum(.data[[quantity]], na.rm = TRUE)) %>%
     ungroup()
   
-  colnames(data) <- c("year", "variable", "quantity")
+  if (!is.na(facet_variable)) {
+    colnames(data) <- c("year", "variable", "facet_var", "quantity")
+  } else {
+    colnames(data) <- c("year", "variable", "quantity")
+  }
+  
+  # limiting facets by values provided
+  if (typeof(facet_values) == "character") {
+    data <- data %>%
+      filter(facet_var %in% facet_values)
+  } else if (typeof(facet_values) == "double") {
+    data <- data %>%
+      group_by(facet_var) %>%
+      mutate(total = sum(quantity, na.rm = TRUE)) %>%
+      ungroup()
+    
+    top_n_value <- data %>%
+      select(total) %>%
+      distinct() %>%
+      arrange(desc(total)) %>%
+      slice_max(order_by = total, n = facet_values) %>%
+      pull(total) %>%
+      min()
+    
+    data <- data %>%
+      filter(total >= top_n_value) 
+    
+  } else {
+    warning("entered invalid facet values")
+    return(NULL)
+  }
   
   # Checking against prop_flow cutoff if necessary
+  prop_flow_cols <- c("year")
+  if(!is.na(facet_variable)) {
+    prop_flow_cols <- c(prop_flow_cols, "facet_var")
+  }
+  
   if (!is.na(prop_flow_cutoff)) {
     data <- data %>%
-      group_by(year) %>%
+      group_by(across(prop_flow_cols)) %>%
       mutate(annual = sum(quantity, na.rm = TRUE)) %>%
       ungroup() %>%
       mutate(prop = quantity / annual) %>%
       mutate(variable = case_when(
         prop < prop_flow_cutoff ~ "Other",
         TRUE ~ variable
-      )) %>%
+      ))
+    
+    prop_flow_cols <- unique(c(prop_flow_cols, "variable"))
+    
+    data <- data %>%
       # Re-summarize based on some categories turned to "Other"
-      group_by(year, variable) %>%
+      group_by(across(prop_flow_cols)) %>%
       summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
       ungroup()
   }
   
+  
+  
   # Filling in missing values for any years with zeros
-  year_grid <- expand_grid(year = unique(data$year), 
-                           variable = unique(data$variable))
+  df_variables <- c()
+  if (!is.na(facet_variable)) {
+    df_variables <- c("year", "variable", "facet_var")
+    year_grid <- expand_grid(year = unique(data$year), 
+                             variable = unique(data$variable),
+                             facet_var = unique(data$facet_var))
+  } else {
+    df_variables <- c("year", "variable")
+    year_grid <- expand_grid(year = unique(data$year), 
+                             variable = unique(data$variable))
+  }
   
   data <- data %>%
     full_join(year_grid,
-              by = c("year", "variable")) %>%
+              by = df_variables) %>%
     mutate(quantity = if_else(is.na(quantity), true = 0, false = quantity))
   
   if (artis_var == "sciname") {
@@ -161,8 +223,18 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
   }
   
   # Reorder (descending) based on quantity
-  data <- data %>%
-    mutate(variable = fct_reorder(variable, quantity))
+  if (!is.na(facet_variable)) {
+    data <- data %>%
+      group_by(year, facet_var) %>%
+      mutate(variable = fct_reorder(variable, quantity)) %>%
+      ungroup()
+  } else {
+    data <- data %>%
+      group_by(year) %>%
+      mutate(variable = fct_reorder(variable, quantity)) %>%
+      ungroup()
+  }
+  
   
   # Reorder so that "Other" always last
   if ("Other" %in% unique(data$variable)) {
@@ -175,14 +247,14 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
   
   if (plot.type == "line") {
     
-    data %>%
+    p <- data %>%
       ggplot(aes(x = year, y = quantity, color = variable)) +
       geom_line(size = 1.1) +
       scale_color_manual(values = artis_palette(length(unique(data$variable)))) +
       labs(y = quantity.lab, x = "Year", title = plot.title, color = color.lab) +
       theme_bw()
   } else {
-    data %>%
+    p <- data %>%
       ggplot() +
       geom_area(aes(x = year, y = quantity, fill = variable)) +
       scale_fill_manual(values = artis_palette(length(unique(data$variable)))) +
@@ -190,4 +262,10 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
       theme_bw() 
   }
   
+  if (!is.na(facet_variable)) {
+    p <- p + 
+      facet_wrap(as.formula(paste(".~", "facet_var")))
+  }
+  
+  return(p)
 }
