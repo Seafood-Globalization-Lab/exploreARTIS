@@ -11,7 +11,11 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
                       plot.type = "line",
                       plot.title = "") {
   
-  if (artis_var == facet_variable) {
+  if(is.na(artis_var)) {
+    warning("please select a variable to plot")
+    return(NULL)
+  } else if (!is.na(facet_variable) & 
+             artis_var == facet_variable) {
     warning("artis_var cannot be the same as facet_variable")
     return(NULL)
   }
@@ -126,29 +130,31 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
   }
   
   # limiting facets by values provided
-  if (typeof(facet_values) == "character") {
-    data <- data %>%
-      filter(facet_var %in% facet_values)
-  } else if (typeof(facet_values) == "double") {
-    data <- data %>%
-      group_by(facet_var) %>%
-      mutate(total = sum(quantity, na.rm = TRUE)) %>%
-      ungroup()
-    
-    top_n_value <- data %>%
-      select(total) %>%
-      distinct() %>%
-      arrange(desc(total)) %>%
-      slice_max(order_by = total, n = facet_values) %>%
-      pull(total) %>%
-      min()
-    
-    data <- data %>%
-      filter(total >= top_n_value) 
-    
-  } else {
-    warning("entered invalid facet values")
-    return(NULL)
+  if (!is.na(facet_variable)) {
+    if (typeof(facet_values) == "character") {
+      data <- data %>%
+        filter(facet_var %in% facet_values)
+    } else if (typeof(facet_values) == "double") {
+      data <- data %>%
+        group_by(facet_var) %>%
+        mutate(total = sum(quantity, na.rm = TRUE)) %>%
+        ungroup()
+      
+      top_n_value <- data %>%
+        select(total) %>%
+        distinct() %>%
+        arrange(desc(total)) %>%
+        slice_max(order_by = total, n = facet_values) %>%
+        pull(total) %>%
+        min()
+      
+      data <- data %>%
+        filter(total >= top_n_value) 
+      
+    } else {
+      warning("entered invalid facet values")
+      return(NULL)
+    }
   }
   
   # Checking against prop_flow cutoff if necessary
