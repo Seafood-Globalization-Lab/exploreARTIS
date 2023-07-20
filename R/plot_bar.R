@@ -207,51 +207,6 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   
   p <- p +
     theme_bw()
-  # 
-  # if(is.na(fill_type) == TRUE){
-  #   # Bar chart with no stacking "fill" group
-  #   p <- data %>% 
-  #     # Summarizing data based on column for bars "bar group"
-  #     group_by(bar_group) %>%
-  #     summarise(quantity = sum(.data[[quantity]], na.rm=TRUE)) %>%
-  #     ungroup() %>%
-  #     # Getting top n values
-  #     slice_max(order_by = quantity, n = top_n) %>%
-  #     mutate(bar_group = fct_reorder(bar_group, quantity)) %>%
-  #     # Creating Bar Chart
-  #     ggplot(aes(x = quantity, y = bar_group)) +
-  #     geom_bar(stat = "identity", fill = "#114F59") +
-  #     labs(x = quantity.lab, y = "") +
-  #     theme_bw()
-  # } else {
-  #   # Case when there is a "fill" or stacking column for bar chart
-  #   
-  #   # Getting a list of top n bars
-  #   top_n_list <- data %>%
-  #     group_by(bar_group) %>%
-  #     summarise(total_quantity = sum(.data[[quantity]], na.rm=TRUE)) %>%
-  #     ungroup() %>%
-  #     slice_max(order_by = total_quantity, n = top_n)
-  #   
-  #   # Getting data for the top n bars
-  #   p <- top_n_list %>% 
-  #     left_join(data, 
-  #               by = "bar_group") %>% 
-  #     mutate(bar_group = fct_reorder(bar_group, total_quantity)) %>%
-  #     group_by(bar_group, .data[[fill_type]]) %>%
-  #     summarise(quantity = sum(.data[[quantity]], na.rm=TRUE)) %>%
-  #     # Creating Bar Chart
-  #     ggplot(aes(x = quantity, y = bar_group, fill = .data[[fill_type]])) +
-  #     geom_bar(stat = "identity") +
-  #     scale_fill_manual(values = c("#114F59", "#741A32", "#D38F35")) +
-  #     labs(x = quantity.lab, y = "", fill = fill_lab, title = plot.title) +
-  #     theme_bw()
-  # }
-  
-  # if (!is.null(facet_type)) {
-  #   p <- p +
-  #     facet_grid(formula(paste("~", facet_type, sep = " ")))
-  # }
-  
+
   return(p)
 }
