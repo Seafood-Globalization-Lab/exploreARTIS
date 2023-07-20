@@ -14,10 +14,13 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
   if(is.na(artis_var)) {
     warning("please select a variable to plot")
     return(NULL)
-  } else if (!is.na(facet_variable) & 
-             artis_var == facet_variable) {
-    warning("artis_var cannot be the same as facet_variable")
-    return(NULL)
+  }
+  
+  if (!is.na(facet_variable)) {
+    if (artis_var == facet_variable) {
+      warning("artis_var cannot be the same as facet_variable")
+      return(NULL)
+    }
   }
   
   #-----------------------------------------------------------------------------
