@@ -1,3 +1,4 @@
+#' Creates a time series line graph/stacked area graph
 #' @import tidyverse
 #' @import countrycode
 #' @import viridis
@@ -7,8 +8,10 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
                       exporters = NA, importers = NA, regions = NA,
                       hs_codes = NA, prod_method = NA, prod_environment = NA,
                       export_source = NA, region_self_loops = TRUE,
-                      weight = "live", facet_variable = NA, facet_values = NA,
+                      weight = "live_weight_t", facet_variable = NA, facet_values = NA,
+                      quantity.lab = NA,
                       plot.type = "line",
+                      legend.title = NA,
                       plot.title = "") {
   
   if(is.na(artis_var)) {
@@ -27,12 +30,16 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
   # Initial variable setup
   
   # Select live or product weight
-  if(weight == "live"){
-    quantity <- "live_weight_t"
-    quantity.lab <- "Quantity (t live weight)"
-  } else {
-    quantity <- "product_weight_t"
-    quantity.lab <- "Quantity (t product weight)"
+  quantity <- weight
+  # If no quantity (y-axis) label is provided try to provide a default option
+  if (is.na(quantity.lab)) {
+    if(quantity == "live_weight_t"){
+      quantity.lab <- "Quantity (t live weight)"
+    } else if (quantity == "product_weight_t") {
+      quantity.lab <- "Quantity (t product weight)"
+    } else {
+      quantity.lab <- ""
+    }
   }
   
   if (artis_var == "partner") {
@@ -48,18 +55,27 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
   }
   
   # Labels for Legend
-  if (artis_var == "method") {
-    color.lab <- "Production Method"
-  } else if (artis_var == "dom_source") {
-    color.lab <- "Export Source"
-  } else if (artis_var == "hs6") {
-    color.lab <- "HS Product"
-  } else if (artis_var == "exporter_iso3c") {
-    color.lab <- "Exporters"
-  } else if (artis_var == "importer_iso3c") {
-    color.lab <- "Importers"
+  # Default legend title will be the one provided
+  # Otherwise will try to provide a standardized name based on ARTIS variable chosen
+  # If legend title cannot be determined by ARTIS variable then it will be blank
+  if (!is.na(legend.title)) {
+    color.lab <- legend.title
   } else {
-    color.lab <- "Species / Species groups"
+    if (artis_var == "method") {
+      color.lab <- "Production Method"
+    } else if (artis_var == "dom_source") {
+      color.lab <- "Export Source"
+    } else if (artis_var == "hs6") {
+      color.lab <- "HS Product"
+    } else if (artis_var == "exporter_iso3c") {
+      color.lab <- "Exporters"
+    } else if (artis_var == "importer_iso3c") {
+      color.lab <- "Importers"
+    } else if (artis_var == "sciname") {
+      color.lab <- "Species/Species Group"
+    } else {
+      color.lab <- ""
+    }
   }
   
   #-----------------------------------------------------------------------------
@@ -166,16 +182,48 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
     prop_flow_cols <- c(prop_flow_cols, "facet_var")
   }
   
-  if (!is.na(prop_flow_cutoff)) {
-    data <- data %>%
-      group_by(across(prop_flow_cols)) %>%
-      mutate(annual = sum(quantity, na.rm = TRUE)) %>%
-      ungroup() %>%
-      mutate(prop = quantity / annual) %>%
-      mutate(variable = case_when(
-        prop < prop_flow_cutoff ~ "Other",
-        TRUE ~ variable
-      ))
+  if (prop_flow_cutoff != 0) {
+    # Calculate proportion across the whole time series
+    
+    # Case when there is no facet variable for the time series
+    if (!("facet_var" %in% prop_flow_cols)) {
+      data <- data %>%
+        # Total across all years
+        mutate(total = sum(quantity, na.rm = TRUE)) %>%
+        # Total by variable group and find proportion across whole timeseries
+        group_by(variable) %>%
+        mutate(var_total = sum(quantity, na.rm = TRUE)) %>%
+        ungroup() %>%
+        # Calculate proportion of variable across whole timeseries
+        # (ie total by importer across whole timeseries / total imports of whole timeseries)
+        mutate(prop = var_total / total) %>%
+        # All variable totals below a the proportional flow cutoff get renamed to "Other"
+        mutate(variable = case_when(
+          prop < prop_flow_cutoff ~ "Other",
+          TRUE ~ variable
+        ))
+    } else {
+      # Case when there is a variable for the time series
+      # Total across all years by facet variable
+      # FIXIT: include an additional function argument "facet_free" to allow each facet to have its own distinct set of top fill variables
+      # (ie Top importers facetted by production habitat, where each facet has a distinct set of top importers)
+      data <- data %>%
+        group_by(facet_var) %>%
+        # Total across all years BY facet variable
+        mutate(facet_total = sum(quantity, na.rm = TRUE)) %>%
+        # Total by variable group AND facet variable and find proportion across each group
+        group_by(variable, facet_var) %>%
+        mutate(var_total = sum(quantity, na.rm = TRUE)) %>%
+        ungroup() %>%
+        # Calculate proportion of variable across facet groups
+        # (ie total by importer by each facet group / total imports of by each facet group)
+        mutate(prop = var_total / facet_total) %>%
+        # All variable totals below a the proportional flow cutoff get renamed to "Other"
+        mutate(variable = case_when(
+          prop < prop_flow_cutoff ~ "Other",
+          TRUE ~ variable
+        ))
+    }
     
     prop_flow_cols <- unique(c(prop_flow_cols, "variable"))
     
@@ -185,8 +233,6 @@ plot_ts <- function(data, artis_var = NA, trade_flow = NA, prop_flow_cutoff = 0.
       summarize(quantity = sum(quantity, na.rm = TRUE)) %>%
       ungroup()
   }
-  
-  
   
   # Filling in missing values for any years with zeros
   df_variables <- c()
