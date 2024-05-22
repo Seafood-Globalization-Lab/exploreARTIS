@@ -169,3 +169,4 @@ plot_sankey(artis, species= c("salmo salar"))
 ```
 
 ![Sankey Plot - Atlantic Salmon trade](imgs/sankey_salmo_salar.png)
+# artis-exchange-planning
