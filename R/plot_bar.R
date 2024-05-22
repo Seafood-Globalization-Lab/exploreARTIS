@@ -25,6 +25,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
                      export_source = NA, regions = NA, weight = "live",
                      common_names = FALSE, fill_type = NA, top_n = 10, 
+                     group.lab = "", x.lab = "quantity",
                      plot.title = "", facet_variable = NA, facet_n = NA){
   
   if (is.na(bar_group)) {
@@ -206,6 +207,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   }
   
   p <- p +
+    labs(y = group.lab) +
     theme_bw()
 
   return(p)
