@@ -25,7 +25,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
                      export_source = NA, regions = NA, weight = "live",
                      common_names = FALSE, fill_type = NA, top_n = 10, 
-                     group.lab = "", x.lab = "quantity",
+                     y.lab = "", x.lab = "quantity", fill.lab = "",
                      plot.title = "", facet_variable = NA, facet_n = NA){
   
   if (is.na(bar_group)) {
@@ -54,10 +54,10 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   
   if (!is.na(fill_type)) {
     if (fill_type == "dom_source") {
-      fill_lab <- "Export Source"
+      fill.lab <- "Export Source"
     } else if (fill_type == "method") {
-      fill_lab <- "Production Method"
-    }
+      fill.lab <- "Production Method"
+    } 
   }
   
   # Filter to data selection based on user input--------------------------------
@@ -115,11 +115,15 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   
   
   # Factors for bar ordering----------------------------------------------------
-  data$dom_source <- factor(data$dom_source,
-                            levels = c("domestic", "foreign", "error"))
-  
-  data$method <- factor(data$method,
-                        levels = c("aquaculture", "capture", "unknown"))
+  if("dom_source" %in% colnames(data)){
+    data$dom_source <- factor(data$dom_source,
+                              levels = c("domestic", "foreign", "error"))
+  }
+
+  if("method" %in% colnames(data)){
+    data$method <- factor(data$method,
+                          levels = c("aquaculture", "capture", "unknown"))
+  }
   
   # Summarizing data by bar group, fill type and facetting group
   grouping_cols <- c("bar_group")
@@ -207,7 +211,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   }
   
   p <- p +
-    labs(y = group.lab) +
+    labs(y = y.lab, x = x.lab, fill = fill.lab) +
     theme_bw()
 
   return(p)

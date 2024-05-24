@@ -82,7 +82,9 @@ plot_ts(artis,
 plot_bar(artis, bar_group = "importer_iso3c")
 plot_bar(artis %>%
            filter(sciname %in% c("salmo salar", "engraulis ringens")), bar_group = "importer_iso3c")
-plot_bar(artis, bar_group = "importer_iso3c", fill_type = "method")
+
+
+plot_bar(artis, bar_group = "importer_iso3c", fill_type = "method") 
 plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "method")
 plot_bar(artis, bar_group = "sciname", fill_type = "method")
 plot_bar(artis, bar_group = "importer_iso3c", fill_type = "dom_source")
