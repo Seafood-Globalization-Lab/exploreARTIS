@@ -23,7 +23,7 @@
 plot_bar <- function(data, bar_group, species = NA, years = NA,
                      producers = NA, exporters = NA, importers = NA,
                      hs_codes = NA, prod_method = NA, prod_environment = NA,
-                     export_source = NA, regions = NA, weight = "live",
+                     export_source = NA, regions = NA, weight = "live_weight_t",
                      common_names = FALSE, fill_type = NA, top_n = 10, 
                      y.lab = "", x.lab = "quantity", fill.lab = "",
                      plot.title = "", facet_variable = NA, facet_n = NA){
@@ -44,12 +44,17 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   
   # Setting up parameters based on user input-----------------------------------
   # Select live or product weight
-  if (weight == "live") {
-    quantity <- "live_weight_t"
-    quantity.lab <- "Quantity (t live weight)"
-  } else {
-    quantity <- "product_weight_t"
-    quantity.lab <- "Quantity (t product weight)"
+  # Select live or product weight
+  quantity <- weight
+  # If no quantity (y-axis) label is provided try to provide a default option
+  if (is.na(x.lab)) {
+    if(quantity == "live_weight_t"){
+      x.lab <- "Quantity (t live weight)"
+    } else if (quantity == "product_weight_t") {
+      x.lab <- "Quantity (t product weight)"
+    } else {
+      x.lab <- ""
+    }
   }
   
   if (!is.na(fill_type)) {

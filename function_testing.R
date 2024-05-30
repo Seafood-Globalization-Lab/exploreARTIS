@@ -115,6 +115,7 @@ plot_bar(artis,
 
 # Test sankey function----------------------------------------------------------
 plot_sankey(artis)
+plot_sankey(artis, cols = c("method", "source_country_iso3c", "exporter_iso3c"))
 plot_sankey(artis, regions = "owid")
 plot_sankey(artis, regions = "region23")
 

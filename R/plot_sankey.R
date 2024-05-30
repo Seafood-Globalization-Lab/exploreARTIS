@@ -19,23 +19,19 @@
 #' @import countrycode
 #' @import ggsankey
 #' @export
-plot_sankey <- function(data, prop_flow_cutoff = 0.05, regions = NA,
+plot_sankey <- function(data, cols = c("source_country_iso3c", "exporter_iso3c", "importer_iso3c"), 
+                        prop_flow_cutoff = 0.05, regions = NA,
                         species = NA, years = NA,
                         producers = NA, exporters = NA, importers = NA,
                         hs_codes = NA, prod_method = NA, prod_environment = NA,
                         export_source = NA, 
-                        weight = "live") {
+                        weight = "live_weight_t", show.other = FALSE, 
+                        plot.title = "") {
   
   # Setting up parameters based on user input-----------------------------------
   
-  # Select live or product weight
-  if (weight == "live") {
-    quantity <- "live_weight_t"
-    quantity.lab <- "Quantity (t live weight)"
-  } else {
-    quantity <- "product_weight_t"
-    quantity.lab <- "Quantity (t product weight)"
-  }
+  # Assign weight column to quantity
+  quantity <- weight
   
   # Filtering data based on user input------------------------------------------
   data <- filter_artis(data, species, years, producers, exporters, importers,
@@ -46,7 +42,7 @@ plot_sankey <- function(data, prop_flow_cutoff = 0.05, regions = NA,
   
   # Summarizing data based on quantity variable selected
   links <- data %>%
-    group_by(source_country_iso3c, exporter_iso3c, importer_iso3c) %>%
+    group_by_at(vars(cols)) %>%
     summarize(total_q = sum(.data[[quantity]], na.rm = TRUE))
   
   # Summarizing by region if requested
@@ -103,102 +99,80 @@ plot_sankey <- function(data, prop_flow_cutoff = 0.05, regions = NA,
   }
   
   # Renaming for consistency
-  colnames(links) <- c("producer", "exporter", "importer", "total_q")
+  colnames(links) <- c(paste("col_", 1:length(cols), sep = ""), "total_q")
+  cols <- colnames(links)[1:length(cols)]
 
+  # Identify list of nodes by column by proportional flow cutoff
+  node_names <- c()
   
-  # Getting list of producers limited by proportional flow cutoff
-  producers <- links %>%
-    group_by(producer) %>%
-    summarize(total_q = sum(total_q, na.rm=TRUE)) %>%
-    ungroup() %>%
-    mutate(total = sum(total_q, na.rm=TRUE)) %>%
-    mutate(prop = total_q / total) %>%
-    mutate(producer = case_when(
-      prop < prop_flow_cutoff ~ "Other",
-      TRUE ~ producer
-    ))
+  for(i in 1:length(cols)){
+    node_i <- links %>%
+      rename(col_i = paste("col_", i, sep = "")) %>%
+      group_by(col_i) %>%
+      summarize(total_q = sum(total_q, na.rm=TRUE)) %>%
+      ungroup() %>%
+      mutate(total = sum(total_q, na.rm=TRUE)) %>%
+      mutate(prop = total_q / total) %>%
+      mutate(name_new = case_when(
+        prop < prop_flow_cutoff ~ "Other",
+        TRUE ~ col_i
+      ))
+    node_names_i <- node_i$name_new
+    
+    node_names <- c(node_names, node_names_i)
+  }
   
-  # Getting list of exporters limited by proportional flow cutoff
-  exporters <- links %>%
-    group_by(exporter) %>%
-    summarize(total_q = sum(total_q, na.rm=TRUE)) %>%
-    ungroup() %>%
-    mutate(total = sum(total_q, na.rm=TRUE)) %>%
-    mutate(prop = total_q / total) %>%
-    mutate(exporter = case_when(
-      prop < prop_flow_cutoff ~ "Other",
-      TRUE ~ exporter
-    ))
-  
-  # Getting list of importers limited by proportional flow cutoff
-  importers <- links %>%
-    group_by(importer) %>%
-    summarize(total_q = sum(total_q, na.rm=TRUE)) %>%
-    ungroup() %>%
-    mutate(total = sum(total_q, na.rm=TRUE)) %>%
-    mutate(prop = total_q / total) %>%
-    mutate(importer = case_when(
-      prop < prop_flow_cutoff ~ "Other",
-      TRUE ~ importer
-    ))
-  
-  # country names of producers, exporters, importers
-  prop_cutoff_partners <- unique(
-    c(producers$producer, 
-      exporters$exporter, 
-      importers$importer)
-  )
+  node_names <- unique(node_names)
   
   # Creating dataframe from sankey----------------------------------------------
   
   sankey_df <- links %>%
     # Filtering data based on prop flow cutoff
-    filter(producer %in% prop_cutoff_partners,
-           exporter %in% prop_cutoff_partners,
-           importer %in% prop_cutoff_partners)
+    filter_at(vars(cols), all_vars(. %in% node_names)) %>%
+    ungroup()
   
   # Get country names if regions are not requested
-  if (is.na(regions)) {
-    sankey_df <- sankey_df %>%
-      left_join(
-        owid_regions %>%
-          select(code, producer_name = country_name),
-        by = c("producer" = "code")
-      ) %>%
-      left_join(
-        owid_regions %>%
-          select(code, exporter_name = country_name),
-        by = c("exporter" = "code")
-      ) %>%
-      left_join(
-        owid_regions %>%
-          select(code, importer_name = country_name),
-        by = c("importer" = "code")
-      ) %>%
-      # Cleaning and re-summarizing
-      mutate(
-        producer_name = case_when(
-          is.na(producer_name) ~ "Other",
-          TRUE ~ producer_name
-        ),
-        exporter_name = case_when(
-          is.na(exporter_name) ~ "Other",
-          TRUE ~ exporter_name
-        ),
-        importer_name = case_when(
-          is.na(importer_name) ~ "Other",
-          TRUE ~ importer_name
-        ),
-      ) %>%
-      group_by(producer_name, exporter_name, importer_name) %>%
-      summarize(total_q = sum(total_q, na.rm = TRUE)) %>%
-      ungroup() %>%
-      rename(producer = producer_name, exporter = exporter_name, importer = importer_name)
-  }
+  # if (is.na(regions)) {
+  #   sankey_df <- sankey_df %>%
+  #     left_join(
+  #       owid_regions %>%
+  #         select(code, producer_name = country_name),
+  #       by = c("producer" = "code")
+  #     ) %>%
+  #     left_join(
+  #       owid_regions %>%
+  #         select(code, exporter_name = country_name),
+  #       by = c("exporter" = "code")
+  #     ) %>%
+  #     left_join(
+  #       owid_regions %>%
+  #         select(code, importer_name = country_name),
+  #       by = c("importer" = "code")
+  #     ) %>%
+  #     # Cleaning and re-summarizing
+  #     mutate(
+  #       producer_name = case_when(
+  #         is.na(producer_name) ~ "Other",
+  #         TRUE ~ producer_name
+  #       ),
+  #       exporter_name = case_when(
+  #         is.na(exporter_name) ~ "Other",
+  #         TRUE ~ exporter_name
+  #       ),
+  #       importer_name = case_when(
+  #         is.na(importer_name) ~ "Other",
+  #         TRUE ~ importer_name
+  #       ),
+  #     ) %>%
+  #     group_by(producer_name, exporter_name, importer_name) %>%
+  #     summarize(total_q = sum(total_q, na.rm = TRUE)) %>%
+  #     ungroup() %>%
+  #     rename(producer = producer_name, exporter = exporter_name, importer = importer_name)
+  #}
   
   sankey_df <- sankey_df %>%
     # Tranforming into ggsankey format (x, node, next_x, next_node)
-    make_long(producer, exporter, importer, value = total_q)
+    make_long({{ cols }}, value = total_q)
   
   num_nodes <- length(unique(c(sankey_df$node,sankey_df$next_node)))
   
@@ -215,7 +189,7 @@ plot_sankey <- function(data, prop_flow_cutoff = 0.05, regions = NA,
     geom_sankey_label(size = 3, color = "white", fill = "gray40") +
     theme_sankey(base_size = 18) +
     scale_fill_manual(values = artis_palette(num_nodes)) + 
-    labs(x = NULL) +
+    labs(x = NULL, title = plot.title) +
     theme(
       legend.position = "none",
       axis.text.x = element_blank()
