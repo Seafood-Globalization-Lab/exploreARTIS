@@ -11,7 +11,7 @@ add_region <- function(data, col, region.col.name = NA){
     rename(source_var_col = {{ col }}) %>%
     left_join(
       owid_regions %>%
-        select(code, region = continent),
+        select(code, region),
       by = c("source_var_col" = "code")) %>%
     mutate(region = case_when(
       source_var_col == "unknown" ~ "Unknown",

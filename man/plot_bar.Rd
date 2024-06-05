@@ -16,11 +16,17 @@ plot_bar(
   prod_method = NA,
   prod_environment = NA,
   export_source = NA,
-  weight = "live",
+  regions = NA,
+  weight = "live_weight_t",
   common_names = FALSE,
   fill_type = NA,
   top_n = 10,
-  plot.title = ""
+  y.lab = "",
+  x.lab = "quantity",
+  fill.lab = "",
+  plot.title = "",
+  facet_variable = NA,
+  facet_n = NA
 )
 }
 \arguments{

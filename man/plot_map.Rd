@@ -8,6 +8,7 @@ plot_map(
   data,
   species = NA,
   years = NA,
+  regions = NA,
   producers = NA,
   exporters = NA,
   importers = NA,
@@ -18,7 +19,10 @@ plot_map(
   weight = "live",
   country_fill = NA,
   flow_arrows = FALSE,
-  n_flows = 10
+  n_flows = 10,
+  arrow_label = NA,
+  fill_label = NA,
+  caption_label = NA
 )
 }
 \arguments{
