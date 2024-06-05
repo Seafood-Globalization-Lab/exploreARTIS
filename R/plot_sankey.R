@@ -2,18 +2,22 @@
 #' 
 #' This is a function that creates a sankey plot showcasing seafood supply chains from producer to importer in the ARTIS dataset.
 #' 
-#' @param data an ARTIS dataframe.
-#' @param cols ADD DESCRIPTION
+#' @param data an ARTIS data frame.
+#' @param cols a vector of the columns that should be used to generate the columns of the Sankey plot, in the order they should appear. 
 #' @param prop_flow_cutoff default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".
 #' @param weight trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."
+#' @param show.other controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE.
+#' @param plot.title add a user-specified title to the plot. 
 #' @return None
 #' @import tidyverse
 #' @import countrycode
 #' @import ggsankey
 #' @export
-plot_sankey <- function(data, cols = c("source_country_iso3c", "exporter_iso3c", "importer_iso3c"), 
+plot_sankey <- function(data, 
+                        cols = c("source_country_iso3c", "exporter_iso3c", "importer_iso3c"), 
                         prop_flow_cutoff = 0.05, 
-                        weight = "live_weight_t", show.other = FALSE, 
+                        weight = "live_weight_t", 
+                        show.other = TRUE, 
                         plot.title = "") {
   
   # Warn user if NAs are present in the selected columns
