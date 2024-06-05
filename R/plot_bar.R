@@ -3,30 +3,29 @@
 #' Function that creates a bar chart for ARTIS data.
 #' 
 #' @param data an ARTIS dataframe.
-#' @param bar_group refers to which column for the bars that will be visualized (ie exporter_iso3c, importer_iso3c, sciname)
-#' @param species list of species/species groups to include, default NA - includes all species.
-#' @param years list of years to include, default NA - includes all years.
-#' @param producers list of producers (as iso3 codes) to include, default NA - includes all producers.
-#' @param exporters list of exporters (as iso3 codes) to include, default NA - includes all exporters.
-#' @param importers list of importers (as iso3 codes) to include, default NA - includes all importers.
-#' @param hs_codes list of hs level 6 codes to include, default NA - includes all hs6 codes.
-#' @param prod_method list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.
-#' @param prod_environment list of environments (marine, inland, or unknown), default NA - includes all environments
-#' @param export_source list of types of export (domestic export, foreign export, or error export), default NA - all export sources.
-#' @param fill_type column to use to stack the bars (ie by method, habitat)
-#' @param weight trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."
+#' @param bar_group refers to which column for the bars that will be visualized (ie exporter_iso3c, importer_iso3c, sciname).
+#' @param value column name for the values the bar length should represent.  
+#' @param fill_type column to use to stack the bars (ie by method, habitat). 
+#' @param top_n number of the top ranked groups to plot. 
+#' @param y.lab text for the y-axis label. 
+#' @param x.lab text for the x-axis label. 
+#' @param fill.lab text for the fill legend label. 
+#' @param plot.title text for the plot title. 
+#' @param facet_variable variable name to facet by.
+#' @param facet_n number of facets to include. Must be specifid if a facet_variable is specified. 
 #' @import tidyverse
 #' @import countrycode
 #' @import viridis
+#' @import tidytext
 #' @export
 
-plot_bar <- function(data, bar_group, species = NA, years = NA,
-                     producers = NA, exporters = NA, importers = NA,
-                     hs_codes = NA, prod_method = NA, prod_environment = NA,
-                     export_source = NA, regions = NA, weight = "live_weight_t",
-                     common_names = FALSE, fill_type = NA, top_n = 10, 
-                     y.lab = "", x.lab = "quantity", fill.lab = "",
-                     plot.title = "", facet_variable = NA, facet_n = NA){
+plot_bar <- function(data, bar_group, 
+                     value = "live_weight_t",
+                     fill_type = NA, 
+                     top_n = 10, 
+                     y.lab = "", x.lab = NA, fill.lab = "",
+                     plot.title = "", 
+                     facet_variable = NA, facet_n = NA){
   
   if (is.na(bar_group)) {
     warning("please select a valid bar group to plot.")
@@ -43,10 +42,10 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   # of the total trade are lumped together as "Other"
   
   # Setting up parameters based on user input-----------------------------------
-  # Select live or product weight
-  # Select live or product weight
-  quantity <- weight
-  # If no quantity (y-axis) label is provided try to provide a default option
+  # Select value column to plot
+  quantity <- value
+  
+  # If no x-axis label is provided try to provide a default option
   if (is.na(x.lab)) {
     if(quantity == "live_weight_t"){
       x.lab <- "Quantity (t live weight)"
@@ -57,6 +56,7 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
     }
   }
   
+  # If no fill label is provided, try to 
   if (!is.na(fill_type)) {
     if (fill_type == "dom_source") {
       fill.lab <- "Export Source"
@@ -64,59 +64,10 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
       fill.lab <- "Production Method"
     } 
   }
-  
-  # Filter to data selection based on user input--------------------------------
-  data <- filter_artis(data, species, years, producers, exporters, importers,
-                       hs_codes, prod_method, prod_environment, export_source)
-  
-  
+
+  # Rename indicated bar group based on bar_group argument
   data <- data %>%
     rename("bar_group" = .data[[bar_group]])
-  
-  # Adding country names or regional names
-  if (bar_group == "exporter_iso3c" | bar_group == "importer_iso3c") {
-    if (is.na(regions)) {
-      data <- data %>%
-        left_join(
-          owid_regions %>%
-            select(code, country_name),
-          by = c("bar_group" = "code")
-        ) %>%
-        mutate(bar_group = country_name) %>%
-        select(-country_name)
-      
-    } else {
-      data <- data %>%
-        left_join(
-          owid_regions %>%
-            select(code, region),
-          by = c("bar_group" = "code")
-        ) %>%
-        mutate(region = case_when(
-          bar_group == "NEI" ~ "Other",
-          TRUE ~ region
-        )) %>%
-        mutate(bar_group = region) %>%
-        select(-region)
-    }
-  }
-  
-  # Formatting and name cleaning for scinames
-  if (bar_group == "sciname") {
-    
-    if (common_names == TRUE) {
-      data <- data %>%
-        left_join(sciname_metadata %>%
-                    select(sciname, common_name),
-                  by = c("bar_group" = "sciname")) %>%
-        mutate(bar_group = common_name) %>%
-        select(-common_name)
-    }
-    
-    # Format scinames for presentation
-    data <- data %>%
-      mutate(bar_group = str_to_sentence(bar_group))
-  }
   
   
   # Factors for bar ordering----------------------------------------------------
@@ -128,6 +79,11 @@ plot_bar <- function(data, bar_group, species = NA, years = NA,
   if("method" %in% colnames(data)){
     data$method <- factor(data$method,
                           levels = c("aquaculture", "capture", "unknown"))
+  }
+  
+  if("habitat" %in% colnames(data)){
+    data$habitat <- factor(data$habitat,
+                          levels = c("marine", "inland", "unknown"))
   }
   
   # Summarizing data by bar group, fill type and facetting group

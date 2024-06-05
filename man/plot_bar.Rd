@@ -7,22 +7,11 @@
 plot_bar(
   data,
   bar_group,
-  species = NA,
-  years = NA,
-  producers = NA,
-  exporters = NA,
-  importers = NA,
-  hs_codes = NA,
-  prod_method = NA,
-  prod_environment = NA,
-  export_source = NA,
-  regions = NA,
-  weight = "live_weight_t",
-  common_names = FALSE,
+  value = "live_weight_t",
   fill_type = NA,
   top_n = 10,
   y.lab = "",
-  x.lab = "quantity",
+  x.lab = NA,
   fill.lab = "",
   plot.title = "",
   facet_variable = NA,
@@ -32,29 +21,25 @@ plot_bar(
 \arguments{
 \item{data}{an ARTIS dataframe.}
 
-\item{bar_group}{refers to which column for the bars that will be visualized (ie exporter_iso3c, importer_iso3c, sciname)}
+\item{bar_group}{refers to which column for the bars that will be visualized (ie exporter_iso3c, importer_iso3c, sciname).}
 
-\item{species}{list of species/species groups to include, default NA - includes all species.}
+\item{value}{column name for the values the bar length should represent.}
 
-\item{years}{list of years to include, default NA - includes all years.}
+\item{fill_type}{column to use to stack the bars (ie by method, habitat).}
 
-\item{producers}{list of producers (as iso3 codes) to include, default NA - includes all producers.}
+\item{top_n}{number of the top ranked groups to plot.}
 
-\item{exporters}{list of exporters (as iso3 codes) to include, default NA - includes all exporters.}
+\item{y.lab}{text for the y-axis label.}
 
-\item{importers}{list of importers (as iso3 codes) to include, default NA - includes all importers.}
+\item{x.lab}{text for the x-axis label.}
 
-\item{hs_codes}{list of hs level 6 codes to include, default NA - includes all hs6 codes.}
+\item{fill.lab}{text for the fill legend label.}
 
-\item{prod_method}{list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.}
+\item{plot.title}{text for the plot title.}
 
-\item{prod_environment}{list of environments (marine, inland, or unknown), default NA - includes all environments}
+\item{facet_variable}{variable name to facet by.}
 
-\item{export_source}{list of types of export (domestic export, foreign export, or error export), default NA - all export sources.}
-
-\item{weight}{trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."}
-
-\item{fill_type}{column to use to stack the bars (ie by method, habitat)}
+\item{facet_n}{number of facets to include. Must be specifid if a facet_variable is specified.}
 }
 \description{
 Function that creates a bar chart for ARTIS data.
