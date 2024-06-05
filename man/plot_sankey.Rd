@@ -8,19 +8,19 @@ plot_sankey(
   data,
   cols = c("source_country_iso3c", "exporter_iso3c", "importer_iso3c"),
   prop_flow_cutoff = 0.05,
-  weight = "live_weight_t",
+  value = "live_weight_t",
   show.other = TRUE,
   plot.title = ""
 )
 }
 \arguments{
-\item{data}{an ARTIS data frame.}
+\item{data}{an ARTIS trade or consumption data frame.}
 
 \item{cols}{a vector of the columns that should be used to generate the columns of the Sankey plot, in the order they should appear.}
 
 \item{prop_flow_cutoff}{default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".}
 
-\item{weight}{trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."}
+\item{value}{trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."}
 
 \item{show.other}{controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE.}
 
