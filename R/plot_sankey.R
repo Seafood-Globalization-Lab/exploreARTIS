@@ -13,7 +13,6 @@
 #' @export
 plot_sankey <- function(data, cols = c("source_country_iso3c", "exporter_iso3c", "importer_iso3c"), 
                         prop_flow_cutoff = 0.05, 
-                        export_source = NA, 
                         weight = "live_weight_t", show.other = FALSE, 
                         plot.title = "") {
   
@@ -40,6 +39,7 @@ plot_sankey <- function(data, cols = c("source_country_iso3c", "exporter_iso3c",
   node_names <- c()
   
   for(i in 1:length(cols)){
+    # Identify nodes in the column falling below the threshold
     node_i <- links %>%
       rename(col_i = paste("col_", i, sep = "")) %>%
       group_by(col_i) %>%
@@ -51,14 +51,31 @@ plot_sankey <- function(data, cols = c("source_country_iso3c", "exporter_iso3c",
         prop < prop_flow_cutoff ~ "Other",
         TRUE ~ col_i
       ))
+    
+    # Create list of nodes
     node_names_i <- node_i$name_new
     
-    node_names <- c(node_names, node_names_i)
+    # Replace node names with "Other" when it falls below the threshold
+    links <- links %>%
+      rename(col_i = paste("col_", i, sep = "")) %>%
+      mutate(col_i = case_when(
+        col_i %in% node_names_i ~ col_i,
+        TRUE ~ "Other"
+      ))
+    
+    colnames(links)[colnames(links) == "col_i"] <- paste("col_", i, sep = "")
+    
+    node_names <- unique(c(node_names, node_names_i))
   }
   
   node_names <- unique(node_names)
   
   # Creating dataframe from sankey----------------------------------------------
+  if(show.other == FALSE){
+    node_names <- node_names[node_names != "Other"]
+  }else{
+    node_names <- node_names
+  }
   
   sankey_df <- links %>%
     # Filtering data based on prop flow cutoff

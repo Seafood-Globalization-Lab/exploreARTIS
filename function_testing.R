@@ -127,9 +127,16 @@ plot_sankey(consumption, cols = c("source_country_iso3c",
             weight = "consumption_live_t")
 
 consumption %>%
-  filter_artis(producers = "NOR", species = "salmo salar") %>%
+  filter_artis(species = "salmo salar") %>%
   plot_sankey(cols = c("source_country_iso3c", "consumer_iso3c"),
-              weight = "consumption_live_t")
+              weight = "consumption_live_t",
+              show.other = TRUE)
+
+artis %>%
+  filter_artis(species = "salmo salar") %>%
+  plot_sankey(cols = c("source_country_iso3c", "importer_iso3c"),
+              weight = "live_weight_t",
+              show.other = FALSE, prop_flow_cutoff = 0.05)
 
 artis %>%
   add_region(col = "importer_iso3c") %>%

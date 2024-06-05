@@ -8,7 +8,6 @@ plot_sankey(
   data,
   cols = c("source_country_iso3c", "exporter_iso3c", "importer_iso3c"),
   prop_flow_cutoff = 0.05,
-  export_source = NA,
   weight = "live_weight_t",
   show.other = FALSE,
   plot.title = ""
