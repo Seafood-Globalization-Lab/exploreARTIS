@@ -63,7 +63,6 @@ plot_ts(artis, artis_var = "hs6", plot.title = "Testing HS Products 2", prop_flo
 plot_ts(artis, artis_var = "sciname", plot.title = "Testing HS Products 2", prop_flow_cutoff = 0.05, plot.type = "stacked")
 plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters", prop_flow_cutoff = 0.05)
 plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters Stacked", prop_flow_cutoff = 0.05, plot.type = "stacked")
-plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporter Regions", regions = "owid")
 
 plot_ts(artis,
         artis_var = "hs6", facet_variable = "sciname",
