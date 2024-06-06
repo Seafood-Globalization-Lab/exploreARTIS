@@ -5,16 +5,19 @@
 #' @param data an ARTIS trade or consumption data frame.
 #' @param cols a vector of the columns that should be used to generate the columns of the Sankey plot, in the order they should appear. 
 #' @param prop_flow_cutoff default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".
-#' @param value trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."
-#' @param show.other controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE.
-#' @param plot.title add a user-specified title to the plot. 
+#' @param value trade quantity column name to visualize. Default is "live_weight_t"
+#' @param show.other controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE, filtering for threshold occurs regardless of this value. 
+#' @param plot.title user-specified title to the plot. Default is a blank title.
 #' @return None
-#' @import tidyverse
-#' @import countrycode
+#' @import ggplot2
+#' @import dplyr
+#' @import tidyr
 #' @import ggsankey
 #' @export
 plot_sankey <- function(data, 
-                        cols = c("source_country_iso3c", "exporter_iso3c", "importer_iso3c"), 
+                        cols = c("source_country_iso3c", 
+                                 "exporter_iso3c", 
+                                 "importer_iso3c"), 
                         prop_flow_cutoff = 0.05, 
                         value = "live_weight_t", 
                         show.other = TRUE, 
@@ -32,10 +35,10 @@ plot_sankey <- function(data,
 
   # Summarizing data based on quantity variable selected
   links <- data %>%
-    group_by_at(vars(cols)) %>%
+    group_by_at(vars(cols)) %>% # vars() deprecated
     summarize(total_q = sum(.data[[quantity]], na.rm = TRUE))
 
-  # Renaming for consistency
+  # Rename specified columns to generic names for processing
   colnames(links) <- c(paste("col_", 1:length(cols), sep = ""), "total_q")
   cols <- colnames(links)[1:length(cols)]
 
@@ -51,30 +54,34 @@ plot_sankey <- function(data,
       ungroup() %>%
       mutate(total = sum(total_q, na.rm=TRUE)) %>%
       mutate(prop = total_q / total) %>%
+      # label those below threshold as "Other" - otherwise keep name
       mutate(name_new = case_when(
         prop < prop_flow_cutoff ~ "Other",
         TRUE ~ col_i
       ))
     
-    # Create list of nodes
+    # Create vector of nodes
     node_names_i <- node_i$name_new
     
-    # Replace node names with "Other" when it falls below the threshold
+    # Replace node names with "Other" when it falls below the threshold 
+    # in links dataframe
     links <- links %>%
       rename(col_i = paste("col_", i, sep = "")) %>%
       mutate(col_i = case_when(
         col_i %in% node_names_i ~ col_i,
         TRUE ~ "Other"
       ))
-    
+    # rename working column with generic name perscribed above 
     colnames(links)[colnames(links) == "col_i"] <- paste("col_", i, sep = "")
     
+    # vector of all node names
     node_names <- unique(c(node_names, node_names_i))
   }
-  
+  # vector of all node names across all columns of interest 
   node_names <- unique(node_names)
   
   # Creating dataframe from sankey----------------------------------------------
+  # keep "Other" observation values if specified, remove if flase
   if(show.other == FALSE){
     node_names <- node_names[node_names != "Other"]
   }else{
@@ -82,13 +89,13 @@ plot_sankey <- function(data,
   }
   
   sankey_df <- links %>%
-    # Filtering data based on prop flow cutoff
+    # Filtering data based on prop flow cutoff - use show.other value 
     filter_at(vars(cols), all_vars(. %in% node_names)) %>%
     ungroup()
   
   sankey_df <- sankey_df %>%
     # Transforming into ggsankey format (x, node, next_x, next_node)
-    make_long({{ cols }}, value = total_q)
+    ggsankey::make_long({{ cols }}, value = total_q)
   
   num_nodes <- length(unique(c(sankey_df$node,sankey_df$next_node)))
   

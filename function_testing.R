@@ -117,25 +117,39 @@ plot_bar(artis,
 
 # Test sankey function----------------------------------------------------------
 plot_sankey(artis)
-plot_sankey(artis, cols = c("method", "source_country_iso3c", "exporter_iso3c"))
-plot_sankey(artis, regions = "owid")
-plot_sankey(artis, regions = "region23")
-plot_sankey(consumption, cols = c("source_country_iso3c", 
-                                  "exporter_iso3c", 
+plot_sankey(artis, cols = c("method", 
+                            "source_country_iso3c", 
+                            "exporter_iso3c"))
+plot_sankey(artis, cols = c("method", 
+                            "source_country_iso3c",
+                            "importer_iso3c",
+                            "exporter_iso3c"))
+plot_sankey(artis, cols = c("habitat",
+                            "method", 
+                            "source_country_iso3c",
+                            "importer_iso3c",
+                            "exporter_iso3c"))
+plot_sankey(artis, cols = c("habitat",
+                            "method", 
+                            "source_country_iso3c"),
+            show.other = FALSE)
+plot_sankey(consumption, cols = c("source_country_iso3c",
+                                  "exporter_iso3c",
                                   "consumer_iso3c"),
-            weight = "consumption_live_t")
-
+            value = "consumption_live_t") 
 consumption %>%
   filter_artis(species = "salmo salar") %>%
-  plot_sankey(cols = c("source_country_iso3c", "consumer_iso3c"),
-              weight = "consumption_live_t",
-              show.other = TRUE)
+  plot_sankey(cols = c("source_country_iso3c", 
+                       "consumer_iso3c"),
+              value = "consumption_live_t",
+              show.other = TRUE) 
 
 artis %>%
   filter_artis(species = "salmo salar") %>%
-  plot_sankey(cols = c("source_country_iso3c", "importer_iso3c"),
-              weight = "live_weight_t",
-              show.other = FALSE, prop_flow_cutoff = 0.05)
+  plot_sankey(cols = c("source_country_iso3c", 
+                       "importer_iso3c"),
+              value = "live_weight_t",
+              show.other = FALSE, prop_flow_cutoff = 0.05) 
 
 artis %>%
   add_region(col = "importer_iso3c") %>%
@@ -157,21 +171,39 @@ artis %>%
 
 # Testing plot_chord
 plot_chord(artis, years = 2016, region_colors = region7_palette)
-plot_chord(artis, years = 2000, prod_method = "capture", focal_country = "USA", 
+plot_chord(artis, 
+           years = 2000, 
+           prod_method = "capture", 
+           focal_country = "USA", 
            region_colors = region7_palette)
-plot_chord(artis, years = 2018, prod_method = "capture", focal_country = "USA", 
+plot_chord(artis, 
+           years = 2018, 
+           prod_method = "capture", 
+           focal_country = "USA", 
            region_colors = region7_palette)
-plot_chord(artis, years = 2000, prod_method = "aquaculture", focal_country = "USA", 
+plot_chord(artis, 
+           years = 2000, 
+           prod_method = "aquaculture", 
+           focal_country = "USA", 
            region_colors = region7_palette)
-plot_chord(artis, years = 2018, prod_method = "aquaculture", focal_country = "USA", 
+plot_chord(artis, 
+           years = 2018, 
+           prod_method = "aquaculture", 
+           focal_country = "USA", 
            region_colors = region7_palette)
 
-plot_chord(artis, years = 2016, focal_country = c("USA", "CHN"), region_colors = region7_palette)
+plot_chord(artis, 
+           years = 2016, 
+           focal_country = c("USA", "CHN"), 
+           region_colors = region7_palette)
 
 # Test plot_chord for region
-plot_chord(regional_artis, years = 2016, 
-           prod_method = "capture", prod_environment = "marine", 
-           plot_region = TRUE, region_colors = region6_palette)
+plot_chord(regional_artis, 
+           years = 2016, 
+           prod_method = "capture", 
+           prod_environment = "marine", 
+           plot_region = TRUE, 
+           region_colors = region6_palette)
 
 # Testing calculate_supply
 supply <- calculate_supply(artis, prod)
