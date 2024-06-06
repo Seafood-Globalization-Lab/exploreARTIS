@@ -14,21 +14,50 @@ plot_sankey(
 )
 }
 \arguments{
-\item{data}{an ARTIS trade or consumption data frame.}
+\item{data}{an ARTIS trade or consumption dataframe.}
 
 \item{cols}{a vector of the columns that should be used to generate the columns of the Sankey plot, in the order they should appear.}
 
 \item{prop_flow_cutoff}{default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".}
 
-\item{value}{trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."}
+\item{value}{trade quantity column name to visualize. Default is "live_weight_t"}
 
-\item{show.other}{controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE.}
+\item{show.other}{controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE, filtering for threshold occurs regardless is "Other" is displayed.}
 
-\item{plot.title}{add a user-specified title to the plot.}
+\item{plot.title}{user-specified title to the plot. Default is a blank title.}
 }
 \value{
 None
 }
 \description{
-This is a function that creates a sankey plot showcasing seafood supply chains from producer to importer in the ARTIS dataset.
+This is a function that creates a sankey plot showcasing elements of seafood supply chains in ARTIS or consumption datasets.
+}
+\examples{
+# create example ARTIS dataframe
+sampled_artis <- data.frame(
+ importer_iso3c = c("TWN", "FRA", "EGY", "CAN", "DEU", "NGA"), 
+ exporter_iso3c = c("IDN", "POL", "NLD", "USA", "LTU", "NLD"),
+ hs6 = c(30111, 30429, 30389, 160419, 160420, 30379), 
+ product_weight_t = c(0.597498424129754, 19.8013245331442, 1.00540089900188, 0.163349070415839, 0.259790317461473, 0.215821987676084), 
+ dom_source = c("domestic", "foreign", "foreign", "foreign", "foreign", "foreign"), 
+ source_country_iso3c = c("IDN", "NOR", "LTU", "TWN", "RUS", "ZAF"), 
+ sciname = c("channa micropeltes", "salmo salar", "scombridae", "sphyraena", "osmerus eperlanus", "zeidae"), 
+ habitat = c("inland", "marine", "marine", "marine", "marine", "marine"), 
+ method = c("capture", "aquaculture", "capture",  "capture", "capture", "capture"), 
+ live_weight_t = c(0.597498424129754, 67.0306773067146, 1.72312004076663, 0.308239695874689, 0.445354829933955, 0.287043243609192), 
+ hs_version = c(12, 7, 12, 12, 12, 7), 
+ year = c(2013, 2012, 2019, 2015, 2016, 2011))
+)
+
+# basic default sankey
+plot_sankey(sampled_artis)
+
+# define alternative columns to use in sankey plot
+plot_sankey(sampled_artis, 
+           cols = c("method", "habitat"))
+
+# Do not filter value by proportion cutoff - retain all flows
+plot_sankey(sampled_artis,
+           prop_flow_cutoff = 0)
+
 }
