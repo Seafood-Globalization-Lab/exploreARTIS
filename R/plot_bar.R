@@ -168,7 +168,7 @@ plot_bar <- function(data, bar_group,
   if (!is.na(facet_variable)) {
     p <- p +
       facet_wrap(as.formula(paste(".~", "facet_variable")), scales = "free") +
-      scale_y_reordered()
+      tidytext::scale_y_reordered()
   }
   
   p <- p +
