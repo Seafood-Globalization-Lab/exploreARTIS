@@ -1,5 +1,28 @@
 ## code to prepare `mini_consumption` dataset goes here
 
+library(DBI)
+
+# connect to local Postgres database (or HEROKU moving forward)
+con <- dbConnect(RPostgres::Postgres(),
+                 dbname=Sys.getenv("POSTGRES_DB"),
+                 host="localhost",
+                 port="5432",
+                 user=Sys.getenv("POSTGRES_USER"),
+                 password=Sys.getenv("POSTGRES_PASSWORD"))
+
+# Check that connection is established by checking which tables are present
+dbListTables(con)
+
+# Pull data
+consumption <- dbGetQuery(con, "SELECT * FROM consumption") %>%
+  select(-record_id)
+
+# Close database connection
+dbDisconnect(con)
+
+rm(list = c("con"))
+
+# Get 100 samples from data
 set.seed(123)
 sample <- consumption[sample(nrow(consumption), 100), ]
 dput(sample)
