@@ -4,3 +4,4 @@ prep_db_files.R
 imgs/
 qa/
 .DS_Store
+^data-raw$
