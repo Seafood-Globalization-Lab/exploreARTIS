@@ -14,17 +14,17 @@ plot_sankey(
 )
 }
 \arguments{
-\item{data}{an ARTIS trade or consumption dataframe.}
+\item{data}{dataframe. An ARTIS trade or consumption dataframe.}
 
-\item{cols}{a vector of the columns that should be used to generate the columns of the Sankey plot, in the order they should appear.}
+\item{cols}{vector. Column names to generate the sections of the Sankey plot, in the order they should appear (left to right).}
 
-\item{prop_flow_cutoff}{default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".}
+\item{prop_flow_cutoff}{integer. A percent in which trade volumes that comprise less than x\% of the total trade are renamed as "Other". Default prop_flow_cutoff = 0.05 means trade volumes less than 5% are labeled as "Other".}
 
-\item{value}{trade quantity column name to visualize. Default is "live_weight_t"}
+\item{value}{character. Trade quantity column name to visualize. Default is "live_weight_t"}
 
-\item{show.other}{controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE, filtering for threshold occurs regardless is "Other" is displayed.}
+\item{show.other}{logical. Controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE, filtering for threshold occurs regardless is "Other" is displayed.}
 
-\item{plot.title}{user-specified title to the plot. Default is a blank title.}
+\item{plot.title}{character. User-specified title to the plot. Default is a blank title.}
 }
 \value{
 None
