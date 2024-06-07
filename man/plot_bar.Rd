@@ -48,12 +48,18 @@ Function that creates a horizontal bar chart for ARTIS or consumption data.
 # Use `mini_artis` dataframe included in package
 
 # Basic plot with importer columns
-plot_bar(mini_artis, bar_group = "importer_iso3c")
+plot_bar(mini_artis, 
+        bar_group = "importer_iso3c")
 
 # Importer bars filled by "habitat" grouping 
-plot_bar(mini_artis, bar_group = "importer_iso3c", fill_type = "habitat")
+plot_bar(mini_artis, 
+        bar_group = "importer_iso3c", 
+        fill_type = "habitat")
 
 # Importer bars faceted by "habitat"
-plot_bar(mini_artis, bar_group = "importer_iso3c", facet_variable  = "habitat", facet_n = 3)
+plot_bar(mini_artis, 
+        bar_group = "importer_iso3c", 
+        facet_variable  = "habitat", 
+        facet_n = 3)
 
 }

@@ -1,33 +1,34 @@
-#' Creates a Sankey plot of ARTIS data
-#' 
-#' This is a function that creates a sankey plot showcasing elements of seafood supply chains in ARTIS or consumption datasets.
+#' Sankey plot of ARTIS data
+#'
+#' A function to create a Sankey plot showcasing elements of seafood supply chains in ARTIS or consumption datasets.
 #' 
 #' @param data dataframe. An ARTIS trade or consumption dataframe.
-#' @param cols vector. Column names to generate the sections of the Sankey plot, in the order they should appear (left to right). 
-#' @param prop_flow_cutoff integer. A percent in which trade volumes that comprise less than x\% of the total trade are renamed as "Other". Default prop_flow_cutoff = 0.05 means trade volumes less than 5% are labeled as "Other".
-#' @param value character. Trade quantity column name to visualize. Default is "live_weight_t"
-#' @param show.other logical. Controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE, filtering for threshold occurs regardless is "Other" is displayed. 
-#' @param plot.title character. User-specified title to the plot. Default is a blank title.
-#' @return None
+#' @param cols vector. Column names to generate the sections of the Sankey plot, in the order they should appear (left to right).
+#' @param prop_flow_cutoff integer. A percent in which trade volumes that comprise less than x\% of the total trade are renamed as "Other". Default prop_flow_cutoff = 0.05 means trade volumes less than 5\% are labeled as "Other".
+#' @param value character. Trade quantity column name to visualize. Default is "live_weight_t".
+#' @param show.other logical. Controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE, filtering for threshold occurs regardless if "Other" is displayed.
+#' @param plot.title character. User-specified title for the plot. Default is a blank title.
+#' @return A Sankey plot.
 #' @examples
-#'# Use `mini_artis` dataframe included in package
+#' # Use `mini_artis` dataframe included in package
 #'
-#'# basic default sankey
-#'plot_sankey(mini_artis)
+#' # Basic default Sankey plot
+#' plot_sankey(mini_artis)
 #'
-#'# define alternative columns to use in sankey plot
-#'plot_sankey(mini_artis, 
-#'            cols = c("method", "habitat"))
+#' # Define alternative columns to use in Sankey plot
+#' plot_sankey(mini_artis, 
+#'             cols = c("method", "habitat"))
 #'
-#'# Do not filter value by proportion cutoff - retain all flows
+#' # Retain all flows - no filtering value by proportion cutoff 
 #' plot_sankey(mini_artis,
-#'            prop_flow_cutoff = 0)
-#' 
+#'             prop_flow_cutoff = 0)
+#'             
 #' @import ggplot2
 #' @import dplyr
 #' @import tidyr
 #' @import ggsankey
 #' @export
+
 plot_sankey <- function(data, 
                         cols = c("source_country_iso3c", 
                                  "exporter_iso3c", 
