@@ -7,9 +7,9 @@
 add_country_name(data, col, country.col.name = NA)
 }
 \arguments{
-\item{data}{dataframe. Must contain column of ISO3c codes}
+\item{data}{dataframe. Must contain chr column of ISO3c codes}
 
-\item{col}{character. Column name within data that cont}
+\item{col}{character. Column name within data that contains ISO3c codes.}
 
 \item{country.col.name}{character. User specified name of new country name column. Default will take input col and add "_name" for the new column name.}
 }
@@ -23,7 +23,6 @@ glimpse(mini_artis \%>\%
           add_country_name("importer_iso3c"))
 
 # Provide new column name
-
 glimpse(mini_artis \%>\% 
           add_country_name("importer_iso3c",
                             country.col.name = "test_column_name"))
