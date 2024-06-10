@@ -1,4 +1,4 @@
-' ARTIS chord diagram
+#' ARTIS chord diagram
 #' 
 #' Function that creates a chord diagram from ARTIS data.
 #' 
