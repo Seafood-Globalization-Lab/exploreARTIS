@@ -7,8 +7,13 @@
 convert_owid_regions(df)
 }
 \arguments{
-\item{df}{- An ARTIS dataframe (needs to include source_country_iso3c, exporter_iso3c, importer_iso3c)}
+\item{df}{dataframe. An ARTIS dataframe (needs to include source_country_iso3c, exporter_iso3c, importer_iso3c)}
 }
 \description{
-Function that takes an ARTIS dataframe and summarizes source, export and import countries as regions.
+`convert_owid_regions( )` takes an ARTIS dataframe and summarizes export and import countries as regions.
+}
+\examples{
+#sumarize by product_weight_t and live_weight_t by exporter_region, importer_region, hs6, sciname, habitat, method, hs_version
+glimpse(mini_artis \%>\% convert_owid_regions())
+
 }
