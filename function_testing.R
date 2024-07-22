@@ -1,8 +1,9 @@
 # Script for testing function
 
 # Load packages
-library(DBI)
-library(tidyverse)
+#library(DBI)
+#library(tidyverse) # try and reduce size of dependencies
+library(dplyr)
 library(exploreARTIS)
 library(countrycode)
 library(sf)
@@ -12,38 +13,9 @@ library(circlize)
 library(ggsankey)
 library(ggpubr)
 
-
-con <- dbConnect(RPostgres::Postgres(),
-                 dbname=Sys.getenv("POSTGRES_DB"),
-                 host="localhost",
-                 port="5432",
-                 user=Sys.getenv("POSTGRES_USER"),
-                 password=Sys.getenv("POSTGRES_PASSWORD"))
-
-# Check that connection is established by checking which tables are present
-dbListTables(con)
-
-# Pull all ARTIS and production data
-artis <- dbGetQuery(con, "SELECT * FROM snet WHERE product_weight_t > 10000") %>%
-  select(-record_id)
-
-consumption <- dbGetQuery(con, "SELECT * FROM complete_consumption WHERE consumption_live_t > 10000") %>%
-  select(-record_id)
-
-prod <- dbGetQuery(con, "SELECT * FROM production") %>%
-  select(-record_id)
-
-countries <- dbGetQuery(con, "SELECT * FROM countries") %>%
-  select(-record_id)
-
-# Close database connection
-dbDisconnect(con)
-
-rm(list = c("con")) 
-
-
+# AM - not sure what this is exactly - need to get a copy
 # regional_artis <- read.csv("/Volumes/jgephart/ARTIS/Outputs/S_net/snet_20220928/regional_snet.csv")
-regional_artis <- artis %>%
+regional_artis <- mini_artis %>%
   left_join(
     countries %>%
       select(exporter_iso3c = iso3c, exporter_region = owid_region),
@@ -58,141 +30,150 @@ regional_artis <- artis %>%
   summarize(live_weight_t = sum(live_weight_t, na.rm = TRUE))
 
 # Test general line graph function----------------------------------------------
-plot_ts(artis, artis_var = "method", plot.title = "Testing Title 2")
-plot_ts(artis, artis_var = "hs6", plot.title = "Testing HS Products 2", prop_flow_cutoff = 0.05)
-plot_ts(artis, artis_var = "sciname", plot.title = "Testing HS Products 2", prop_flow_cutoff = 0.05, plot.type = "stacked")
-plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters", prop_flow_cutoff = 0.05)
-plot_ts(artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters Stacked", prop_flow_cutoff = 0.05, plot.type = "stacked")
+plot_ts(mini_artis, artis_var = "method", plot.title = "Testing Title 2")
+plot_ts(mini_artis, artis_var = "hs6", plot.title = "Testing HS Products 2", prop_flow_cutoff = 0.05)
+plot_ts(mini_artis, artis_var = "sciname", plot.title = "Testing HS Products 2", prop_flow_cutoff = 0.05, plot.type = "stacked")
+plot_ts(mini_artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters", prop_flow_cutoff = 0.05)
+plot_ts(mini_artis, artis_var = "exporter_iso3c", plot.title = "Testing Exporters Stacked", prop_flow_cutoff = 0.05, plot.type = "stacked")
 
-plot_ts(artis,
+plot_ts(mini_artis,
         artis_var = "hs6", facet_variable = "sciname",
         plot.type = "stacked", facet_values = 6, prop_flow_cutoff = 0.1)
 
-plot_ts(artis,
+plot_ts(mini_artis,
         artis_var = "sciname", facet_variable = "hs6",
         plot.type = "stacked", facet_values = 6, prop_flow_cutoff = 0.1)
 
-plot_ts(artis,
+plot_ts(mini_artis,
         artis_var = "sciname", facet_variable = "method",
         plot.type = "stacked", facet_values = 6, prop_flow_cutoff = 0.1)
 
-plot_ts(artis,
+plot_ts(mini_artis,
         artis_var = "method", facet_variable = "method",
         plot.type = "stacked", facet_values = 6, prop_flow_cutoff = 0.1)
 
 # Testing plot_bar
-plot_bar(artis, bar_group = "importer_iso3c")
-plot_bar(artis %>%
-           filter(sciname %in% c("salmo salar", "engraulis ringens")), bar_group = "importer_iso3c")
+plot_bar(mini_artis, bar_group = "importer_iso3c")
+# need to make sure sciname exsist in mini_artis
+plot_bar(mini_artis %>%
+           filter(sciname %in% c("salmo", "salvelinus alpinus")), bar_group = "importer_iso3c")
 
-
-plot_bar(artis, bar_group = "importer_iso3c", fill_type = "method") 
-plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "method")
-plot_bar(artis, bar_group = "sciname", fill_type = "method")
-plot_bar(artis, bar_group = "importer_iso3c", fill_type = "dom_source")
-plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
-plot_bar(artis, bar_group = "sciname", fill_type = "dom_source")
-plot_bar(artis, bar_group = "exporter_iso3c", regions = TRUE)
-plot_bar(artis, bar_group = "exporter_iso3c", regions = TRUE, fill_type = "dom_source")
-plot_bar(artis, bar_group = "importer_iso3c", regions = TRUE)
-
-plot_bar(artis,
+plot_bar(mini_artis, bar_group = "importer_iso3c", fill_type = "method") 
+plot_bar(mini_artis, bar_group = "exporter_iso3c", fill_type = "method")
+plot_bar(mini_artis, bar_group = "sciname", fill_type = "method")
+plot_bar(mini_artis, bar_group = "importer_iso3c", fill_type = "dom_source")
+plot_bar(mini_artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
+plot_bar(mini_artis, bar_group = "sciname", fill_type = "dom_source")
+plot_bar(mini_artis,
         bar_group = "hs6", facet_variable = "sciname", facet_n = 6)
 
-plot_bar(artis,
+plot_bar(mini_artis,
          bar_group = "sciname", facet_variable = "hs6", facet_n = 6,
          fill_type = "method")
 
-plot_bar(artis,
+plot_bar(mini_artis,
          bar_group = "hs6", facet_variable = "sciname", facet_n = 6,
          fill_type = "method")
 
-plot_bar(artis,
+plot_bar(mini_artis,
         bar_group = "sciname", facet_variable = "hs6", facet_n = 5)
 
-plot_bar(artis,
-        bar_group = "sciname", facet_variable = "method", facet_n = 4)
-
-
+plot_bar(mini_artis,
+        bar_group = "sciname", facet_variable = "hs6", facet_n = 4)
 
 # Test sankey function----------------------------------------------------------
-plot_sankey(artis)
-plot_sankey(artis, cols = c("method", 
+plot_sankey(mini_artis)
+plot_sankey(mini_artis, cols = c("method", 
                             "source_country_iso3c", 
                             "exporter_iso3c"))
-plot_sankey(artis, cols = c("method", 
+plot_sankey(mini_artis, cols = c("method", 
                             "source_country_iso3c",
                             "importer_iso3c",
                             "exporter_iso3c"))
-plot_sankey(artis, cols = c("habitat",
+plot_sankey(mini_artis, cols = c("habitat",
                             "method", 
                             "source_country_iso3c",
                             "importer_iso3c",
                             "exporter_iso3c"))
-plot_sankey(artis, cols = c("habitat",
+plot_sankey(mini_artis, cols = c("habitat",
+                                 "method", 
+                                 "source_country_iso3c"),
+            show.other = TRUE)
+plot_sankey(mini_artis, cols = c("habitat",
                             "method", 
                             "source_country_iso3c"),
             show.other = FALSE)
-plot_sankey(consumption, cols = c("source_country_iso3c",
+plot_sankey(mini_consumption, cols = c("source_country_iso3c",
                                   "exporter_iso3c",
                                   "consumer_iso3c"),
             value = "consumption_live_t") 
-consumption %>%
-  filter_artis(species = "salmo salar") %>%
+# stack functions with consumption
+mini_consumption %>%
+  filter_artis(species = c("macrobrachium rosenbergii", 
+                           "pomatomus saltatrix",
+                           "octopus vulgaris")) %>%
   plot_sankey(cols = c("source_country_iso3c", 
                        "consumer_iso3c"),
-              value = "consumption_live_t",
+              value = "consumption_t",
               show.other = TRUE) 
 
-artis %>%
-  filter_artis(species = "salmo salar") %>%
+mini_artis %>%
+  filter_artis(species = "elasmobranchii") %>%
   plot_sankey(cols = c("source_country_iso3c", 
                        "importer_iso3c"),
               value = "live_weight_t",
-              show.other = FALSE, prop_flow_cutoff = 0.05) 
+              show.other = FALSE, prop_flow_cutoff = 0.5) 
 
-artis %>%
+mini_artis %>%
+  filter_artis(species = c("elasmobranchii", 
+                           "salvelinus alpinus")) %>%
+  plot_sankey(cols = c("source_country_iso3c", 
+                       "importer_iso3c"),
+              value = "live_weight_t",
+              show.other = TRUE, prop_flow_cutoff = 0) 
+# stack functions with artis
+mini_artis %>%
   add_region(col = "importer_iso3c") %>%
   add_region(col = "source_country_iso3c") %>%
   plot_sankey(cols = c("source_country_iso3c_region", "importer_iso3c_region"))
 
-# Test regional sankey function-------------------------------------------------
-plot_regional_sankey_method_habitat(regional_artis, 1996, 2019)
-plot_regional_sankey_method_habitat(regional_artis, 2019, 2019)
-
-# Testing mapping function
-artis %>% 
-  filter(exporter_iso3c == "KIR") %>%
+# Testing mapping function - Need to update
+mini_artis %>% 
+ # filter(exporter_iso3c == "KIR") %>%
   plot_map(country_fill = "importer_iso3c", flow_arrows = TRUE, n_flows = 10)
 
 # Testing mapping for regions
-artis %>%
-  plot_map(country_fill = "export", flow_arrows = TRUE, regions = TRUE)
+mini_artis %>%
+  plot_map(country_fill = "exporter_iso3c", flow_arrows = TRUE, regions = TRUE)
 
 # Testing plot_chord
-plot_chord(artis, years = 2016, region_colors = region7_palette)
-plot_chord(artis, 
+# fail
+plot_chord(mini_artis, years = 2016, region_colors = region7_palette)
+# fail
+plot_chord(mini_artis, 
            years = 2000, 
            prod_method = "capture", 
            focal_country = "USA", 
            region_colors = region7_palette)
-plot_chord(artis, 
+plot_chord(mini_artis, 
            years = 2018, 
            prod_method = "capture", 
            focal_country = "USA", 
            region_colors = region7_palette)
-plot_chord(artis, 
+# fail
+plot_chord(mini_artis, 
            years = 2000, 
            prod_method = "aquaculture", 
            focal_country = "USA", 
            region_colors = region7_palette)
-plot_chord(artis, 
+# fail
+plot_chord(mini_artis, 
            years = 2018, 
            prod_method = "aquaculture", 
            focal_country = "USA", 
            region_colors = region7_palette)
-
-plot_chord(artis, 
+# fail
+plot_chord(mini_artis, 
            years = 2016, 
            focal_country = c("USA", "CHN"), 
            region_colors = region7_palette)
@@ -205,8 +186,8 @@ plot_chord(regional_artis,
            plot_region = TRUE, 
            region_colors = region6_palette)
 
-# Testing calculate_supply
-supply <- calculate_supply(artis, prod)
+# Testing calculate_supply - fail
+supply <- calculate_supply(mini_artis, prod)
 
 # Negative supply
 supply_negative_summary <- supply %>% 

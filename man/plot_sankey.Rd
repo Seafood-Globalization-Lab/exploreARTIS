@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_sankey.R
 \name{plot_sankey}
 \alias{plot_sankey}
-\title{Creates a Sankey plot of ARTIS data}
+\title{Sankey plot of ARTIS data}
 \usage{
 plot_sankey(
   data,
@@ -14,50 +14,36 @@ plot_sankey(
 )
 }
 \arguments{
-\item{data}{an ARTIS trade or consumption dataframe.}
+\item{data}{dataframe. An ARTIS trade or consumption dataframe.}
 
-\item{cols}{a vector of the columns that should be used to generate the columns of the Sankey plot, in the order they should appear.}
+\item{cols}{vector. Column names to generate the sections of the Sankey plot, in the order they should appear (left to right).}
 
-\item{prop_flow_cutoff}{default prop_flow_cutoff = 0.05 means trade volumes that comprise less than 5\% of the total trade are lumped together as "Other".}
+\item{prop_flow_cutoff}{integer. A percent in which trade volumes that comprise less than x\% of the total trade are renamed as "Other". Default prop_flow_cutoff = 0.05 means trade volumes less than 5\% are labeled as "Other".}
 
-\item{value}{trade quantity column name to visualize. Default is "live_weight_t"}
+\item{value}{character. Trade quantity column name to visualize. Default is "live_weight_t".}
 
-\item{show.other}{controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE, filtering for threshold occurs regardless is "Other" is displayed.}
+\item{show.other}{logical. Controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE, filtering for threshold occurs regardless if "Other" is displayed.}
 
-\item{plot.title}{user-specified title to the plot. Default is a blank title.}
+\item{plot.title}{character. User-specified title for the plot. Default is a blank title.}
 }
 \value{
-None
+A Sankey plot.
 }
 \description{
-This is a function that creates a sankey plot showcasing elements of seafood supply chains in ARTIS or consumption datasets.
+A function to create a Sankey plot showcasing elements of seafood supply chains in ARTIS or consumption datasets.
 }
 \examples{
-# create example ARTIS dataframe
-sampled_artis <- data.frame(
- importer_iso3c = c("TWN", "FRA", "EGY", "CAN", "DEU", "NGA"), 
- exporter_iso3c = c("IDN", "POL", "NLD", "USA", "LTU", "NLD"),
- hs6 = c(30111, 30429, 30389, 160419, 160420, 30379), 
- product_weight_t = c(0.597498424129754, 19.8013245331442, 1.00540089900188, 0.163349070415839, 0.259790317461473, 0.215821987676084), 
- dom_source = c("domestic", "foreign", "foreign", "foreign", "foreign", "foreign"), 
- source_country_iso3c = c("IDN", "NOR", "LTU", "TWN", "RUS", "ZAF"), 
- sciname = c("channa micropeltes", "salmo salar", "scombridae", "sphyraena", "osmerus eperlanus", "zeidae"), 
- habitat = c("inland", "marine", "marine", "marine", "marine", "marine"), 
- method = c("capture", "aquaculture", "capture",  "capture", "capture", "capture"), 
- live_weight_t = c(0.597498424129754, 67.0306773067146, 1.72312004076663, 0.308239695874689, 0.445354829933955, 0.287043243609192), 
- hs_version = c(12, 7, 12, 12, 12, 7), 
- year = c(2013, 2012, 2019, 2015, 2016, 2011))
-)
+# Use `mini_artis` dataframe included in package
 
-# basic default sankey
-plot_sankey(sampled_artis)
+# Basic default Sankey plot
+plot_sankey(mini_artis)
 
-# define alternative columns to use in sankey plot
-plot_sankey(sampled_artis, 
-           cols = c("method", "habitat"))
+# Define alternative columns to use in Sankey plot
+plot_sankey(mini_artis, 
+            cols = c("method", "habitat"))
 
-# Do not filter value by proportion cutoff - retain all flows
-plot_sankey(sampled_artis,
-           prop_flow_cutoff = 0)
-
+# Retain all flows - no filtering value by proportion cutoff 
+plot_sankey(mini_artis,
+            prop_flow_cutoff = 0)
+            
 }

@@ -1,6 +1,27 @@
-#' @import tidyverse
+#' Convert country ISO3c codes to name column
+#' 
+#' `add_country_name()` takes an ISO 3166-1 alpha-3 codes column and creates a new column with full country names using OWID table.
+#' 
+#' @param data dataframe. Must contain chr column of ISO3c codes
+#' @param col character. Column name within data that contains ISO3c codes.
+#' @param country.col.name character. User specified name of new country name column. Default will take input col and add "_name" for the new column name.
+#' @examples
+#' 
+#' # Convert importer column codes to new column of full names
+#' glimpse(mini_artis %>% 
+#'           add_country_name("importer_iso3c"))
+#' 
+#' # Provide new column name
+#' glimpse(mini_artis %>% 
+#'           add_country_name("importer_iso3c",
+#'                             country.col.name = "test_column_name"))
+#' 
+#' @import dplyr
 #' @export
-add_country_name <- function(data, col, country.col.name = NA){
+
+add_country_name <- function(data, 
+                             col, 
+                             country.col.name = NA){
   if(is.na(country.col.name) == TRUE){
     country.col.name <- paste(col, "_name", sep = "")
   }else{

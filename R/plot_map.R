@@ -5,6 +5,7 @@
 #' @param data an ARTIS dataframe.
 #' @param species list of species/species groups to include, default NA - includes all species.
 #' @param years list of years to include, default NA - includes all years.
+#' @param region logical. Whether to group countries by region.
 #' @param producers list of producers (as iso3 codes) to include, default NA - includes all producers.
 #' @param exporters list of exporters (as iso3 codes) to include, default NA - includes all exporters.
 #' @param importers list of importers (as iso3 codes) to include, default NA - includes all importers.

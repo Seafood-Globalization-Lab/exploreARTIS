@@ -19,28 +19,47 @@ plot_bar(
 )
 }
 \arguments{
-\item{data}{an ARTIS dataframe.}
+\item{data}{dataframe. ARTIS or consumption data.}
 
-\item{bar_group}{refers to which column for the bars that will be visualized (ie exporter_iso3c, importer_iso3c, sciname).}
+\item{bar_group}{character. Column name in data to group data into bars in plot (e.g. "sciname").}
 
-\item{value}{column name for the values the bar length should represent.}
+\item{value}{character. Column name in data for the values the bar length.}
 
-\item{fill_type}{column to use to stack the bars (ie by method, habitat).}
+\item{fill_type}{character. Column name to use to stack the bars (e.g. "method" or "habitat").}
 
-\item{top_n}{number of the top ranked groups to plot.}
+\item{top_n}{numeric. Number of top ranked groups to plot.}
 
-\item{y.lab}{text for the y-axis label.}
+\item{y.lab}{character. Text for the y-axis label (e.g. "My title").}
 
-\item{x.lab}{text for the x-axis label.}
+\item{x.lab}{character. Text for the x-axis label.}
 
-\item{fill.lab}{text for the fill legend label.}
+\item{fill.lab}{character. Text for the fill legend label.}
 
-\item{plot.title}{text for the plot title.}
+\item{plot.title}{character. Text for the plot title.}
 
-\item{facet_variable}{variable name to facet by.}
+\item{facet_variable}{character. Column name to facet by.}
 
-\item{facet_n}{number of facets to include. Must be specifid if a facet_variable is specified.}
+\item{facet_n}{numeric. Number of facets to include. Must be specified if a facet_variable is specified.}
 }
 \description{
-Function that creates a bar chart for ARTIS data.
+Function that creates a horizontal bar chart for ARTIS or consumption data.
+}
+\examples{
+# Use `mini_artis` dataframe included in package
+
+# Basic plot with importer columns
+plot_bar(mini_artis, 
+        bar_group = "importer_iso3c")
+
+# Importer bars filled by "habitat" grouping 
+plot_bar(mini_artis, 
+        bar_group = "importer_iso3c", 
+        fill_type = "habitat")
+
+# Importer bars faceted by "habitat"
+plot_bar(mini_artis, 
+        bar_group = "importer_iso3c", 
+        facet_variable  = "habitat", 
+        facet_n = 3)
+
 }

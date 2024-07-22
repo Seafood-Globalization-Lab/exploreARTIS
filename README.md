@@ -61,7 +61,7 @@ library(exploreARTIS)
 # Bar chart visualizing seafood trade volumes by exporter
 plot_bar(artis, bar_group = "exporter_iso3c")
 ```
-![Bar Chart - by exporter](imgs/all_trade_export_bar.png)
+![Bar Chart - by exporter](images/all_trade_export_bar.png)
 
 
 ```r
@@ -71,7 +71,7 @@ library(exploreARTIS)
 # Bar chart visualizing seafood trade volumes by exporter and filling by export source
 plot_bar(artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
 ```
-![Bar Chart - by exporter and dom_source](imgs/all_trade_export_dom_source_bar.png)
+![Bar Chart - by exporter and dom_source](images/all_trade_export_dom_source_bar.png)
 
 ### Analyzing trade partners
 **Note:** you can visualize exporters and importers with the following functions. Adjust the trade_flow input variable accordingly from trade_flow = "export", to trade_flow = "import"
@@ -83,7 +83,7 @@ library(exploreARTIS)
 
 plot_partner_line(artis, trade_flow = "export")
 ```
-![Line Graph - all seafood trade, exporters](imgs/line_all_trade.png)
+![Line Graph - all seafood trade, exporters](images/line_all_trade.png)
 
 A stacked line graph of all export partners in the ARTIS dataset
 ```r
@@ -92,7 +92,7 @@ library(exploreARTIS)
 
 plot_partner_stacked(artis, trade_flow = "export")
 ```
-![Stacked Line Graph - all seafood trade, exporters](imgs/line_stacked_all_trade.png)
+![Stacked Line Graph - all seafood trade, exporters](images/line_stacked_all_trade.png)
 
 ### Analyzing Species Trends
 ```r
@@ -101,7 +101,7 @@ library(exploreARTIS)
 
 plot_species_line(artis, plot.title = "Species Trends 1995 - 2019")
 ```
-![Line Graph - all Species Trends](imgs/all_trade_species_line.png)
+![Line Graph - all Species Trends](images/all_trade_species_line.png)
 
 ```r
 # loading library
@@ -109,7 +109,7 @@ library(exploreARTIS)
 
 plot_species_stacked(artis)
 ```
-![Stacked Line Graph - all Species Trends](imgs/all_trade_species_stacked.png)
+![Stacked Line Graph - all Species Trends](images/all_trade_species_stacked.png)
 
 
 ### Visualizing Trade Networks
@@ -123,7 +123,7 @@ library(exploreARTIS)
 plot_sankey(artis)
 
 ```
-![Sankey Plot - all seafood trade](imgs/sankey_all_trade.png)
+![Sankey Plot - all seafood trade](images/sankey_all_trade.png)
 
 Chord Diagrams - This is a great way to visualize export and import trade flows.
 ```r
@@ -133,7 +133,7 @@ library(exploreARTIS)
 # Chord diagram of all seafood trade
 plot_chord(artis)
 ```
-![Chord Diagram - all seafood trade](imgs/all_trade_chord.png)
+![Chord Diagram - all seafood trade](images/all_trade_chord.png)
 
 Map - This is a great way to visualize trade flows.
 ```r
@@ -143,7 +143,7 @@ library(exploreARTIS)
 # Map of seafood exports from Chile
 plot_map(artis, exporters = "CHL", country_fill = "import", flow_arrows = TRUE)
 ```
-![Map - Chile seafood trade](imgs/chl_map_flows.png)
+![Map - Chile seafood trade](images/chl_map_flows.png)
 
 ## More advanced examples
 
@@ -156,7 +156,7 @@ library(exploreARTIS)
 plot_sankey(artis, producers = c("CHL"))
 ```
 
-![Sankey Plot - Chilean seafood trade](imgs/sankey_chl_trade.png)
+![Sankey Plot - Chilean seafood trade](images/sankey_chl_trade.png)
 
 ```r
 # loading libraries
@@ -168,5 +168,5 @@ library(exploreARTIS)
 plot_sankey(artis, species= c("salmo salar"))
 ```
 
-![Sankey Plot - Atlantic Salmon trade](imgs/sankey_salmo_salar.png)
+![Sankey Plot - Atlantic Salmon trade](images/sankey_salmo_salar.png)
 # artis-exchange-planning

@@ -1,31 +1,53 @@
 #' ARTIS Bar Chart
 #' 
-#' Function that creates a bar chart for ARTIS data.
+#' Function that creates a horizontal bar chart for ARTIS or consumption data.
 #' 
-#' @param data an ARTIS dataframe.
-#' @param bar_group refers to which column for the bars that will be visualized (ie exporter_iso3c, importer_iso3c, sciname).
-#' @param value column name for the values the bar length should represent.  
-#' @param fill_type column to use to stack the bars (ie by method, habitat). 
-#' @param top_n number of the top ranked groups to plot. 
-#' @param y.lab text for the y-axis label. 
-#' @param x.lab text for the x-axis label. 
-#' @param fill.lab text for the fill legend label. 
-#' @param plot.title text for the plot title. 
-#' @param facet_variable variable name to facet by.
-#' @param facet_n number of facets to include. Must be specifid if a facet_variable is specified. 
+#' @param data dataframe. ARTIS or consumption data.
+#' @param bar_group character. Column name in data to group data into bars in plot (e.g. "sciname").
+#' @param value character. Column name in data for the values the bar length.
+#' @param fill_type character. Column name to use to stack the bars (e.g. "method" or "habitat"). 
+#' @param top_n numeric. Number of top ranked groups to plot. 
+#' @param y.lab character. Text for the y-axis label (e.g. "My title"). 
+#' @param x.lab character. Text for the x-axis label. 
+#' @param fill.lab character. Text for the fill legend label. 
+#' @param plot.title character. Text for the plot title. 
+#' @param facet_variable character. Column name to facet by.
+#' @param facet_n numeric. Number of facets to include. Must be specified if a facet_variable is specified. 
+#' @examples 
+#'# Use `mini_artis` dataframe included in package
+#'
+#'# Basic plot with importer columns
+#'plot_bar(mini_artis, 
+#'         bar_group = "importer_iso3c")
+#' 
+#'# Importer bars filled by "habitat" grouping 
+#'plot_bar(mini_artis, 
+#'         bar_group = "importer_iso3c", 
+#'         fill_type = "habitat")
+#'
+#'# Importer bars faceted by "habitat"
+#'plot_bar(mini_artis, 
+#'         bar_group = "importer_iso3c", 
+#'         facet_variable  = "habitat", 
+#'         facet_n = 3)
+#' 
 #' @import tidyverse
 #' @import countrycode
 #' @import viridis
 #' @import tidytext
 #' @export
 
-plot_bar <- function(data, bar_group, 
+plot_bar <- function(data, 
+                     bar_group, 
                      value = "live_weight_t",
                      fill_type = NA, 
                      top_n = 10, 
-                     y.lab = "", x.lab = NA, fill.lab = "",
+                     y.lab = "", 
+                     x.lab = NA, 
+                     fill.lab = "",
                      plot.title = "", 
-                     facet_variable = NA, facet_n = NA){
+                     facet_variable = NA, 
+                     facet_n = NA){
   
   if (is.na(bar_group)) {
     warning("please select a valid bar group to plot.")

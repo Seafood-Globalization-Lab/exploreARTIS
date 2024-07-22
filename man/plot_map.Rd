@@ -53,6 +53,8 @@ plot_map(
 \item{flow_arrows}{logical variable - set to TRUE to include top trade flow arrows.}
 
 \item{n_flows}{number of top trade flow arrows to include if flow_arrows = TRUE - defaults to 10.}
+
+\item{region}{logical. Whether to group countries by region.}
 }
 \value{
 None
