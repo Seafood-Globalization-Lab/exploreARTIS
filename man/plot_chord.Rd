@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_chord.R
 \name{plot_chord}
 \alias{plot_chord}
-\title{Function that creates a chord diagram from ARTIS data.}
+\title{ARTIS chord diagram}
 \usage{
 plot_chord(
   data,

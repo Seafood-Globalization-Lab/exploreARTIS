@@ -130,6 +130,6 @@ plot_sankey <- function(data,
     labs(x = NULL, title = plot.title) +
     theme(
       legend.position = "none",
-      axis.text.x = element_blank()
+      axis.text.x = element_text()
     )
 }
