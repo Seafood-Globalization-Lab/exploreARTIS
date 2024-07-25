@@ -12,7 +12,7 @@
 #' @param fill.lab character. Text for the fill legend label. 
 #' @param plot.title character. Text for the plot title. 
 #' @param facet_variable character. Column name to facet by.
-#' @param facet_n numeric. Number of facets to include. Must be specified if a facet_variable is specified. 
+#' @param facet_values number of facets or vector of facet categories to include. Must be specifid if a facet_variable is specified. 
 #' @examples 
 #'# Use `mini_artis` dataframe included in package
 #'
@@ -29,7 +29,7 @@
 #'plot_bar(mini_artis, 
 #'         bar_group = "importer_iso3c", 
 #'         facet_variable  = "habitat", 
-#'         facet_n = 3)
+#'         facet_values = 3)
 #' 
 #' @import tidyverse
 #' @import countrycode
@@ -47,7 +47,7 @@ plot_bar <- function(data,
                      fill.lab = "",
                      plot.title = "", 
                      facet_variable = NA, 
-                     facet_n = NA){
+                     facet_values = NA){
   
   if (is.na(bar_group)) {
     warning("please select a valid bar group to plot.")
@@ -129,50 +129,66 @@ plot_bar <- function(data,
   } else if (!is.na(fill_type) & !is.na(facet_variable)) {
     colnames(data) <- c("bar_group", "fill_type", "facet_variable", "quantity")
   } else if (is.na(fill_type) & !is.na(facet_variable)) {
-    colnames(data) <- c("bar_group", "facet_variable", "quantity")
+    colnames(data) <- c("bar_group", "facet_var", "quantity")
   }
   
-  # facetting
+  # limiting facets by values provided
   if (!is.na(facet_variable)) {
-    data <- data %>%
-      group_by(facet_variable) %>%
-      slice_max(order_by = quantity, n = top_n) %>%
-      ungroup()# %>%
-      # mutate(bar_group = reorder_within(bar_group, quantity, facet_variable))
-    
-    top_facet_n <- data %>%
-      group_by(facet_variable) %>%
-      summarize(facet_total = sum(quantity, na.rm = TRUE)) %>%
-      ungroup() %>%
-      slice_max(order_by = facet_total, n = facet_n)
-    
-    data <- data %>%
-      filter(facet_variable %in% unique(top_facet_n$facet_variable)) %>%
-      # only group by bar group and facet variable since fill type may still be selected
-      group_by(bar_group, facet_variable) %>%
-      mutate(facet_total = sum(quantity, na.rm = TRUE)) %>%
-      ungroup() %>%
-      mutate(bar_group = reorder_within(bar_group, facet_total, facet_variable))
-    
-  } else if (is.na(facet_variable)) {
-    # Summarizing for top n variables
-    data <- data %>%
-      group_by(bar_group) %>%
-      mutate(total = sum(quantity, na.rm = TRUE)) %>%
-      ungroup()
-    
-    # Top N bars in the bar chart
-    top_n_value <- data %>%
-      select(bar_group, total) %>%
-      distinct() %>%
-      slice_max(order_by = total, n = top_n) %>%
-      pull(total) %>%
-      min()
-    
-    data <- data %>%
-      filter(total >= top_n_value) %>%
-      mutate(bar_group = reorder(bar_group, total))
-  }
+    if (typeof(facet_values) == "character") {
+      data <- data %>%
+        filter(facet_var %in% facet_values) %>%
+        group_by(bar_group, facet_var) %>%
+        mutate(total = sum(quantity, na.rm = TRUE)) %>%
+        group_by(facet_var) %>%
+        slice_max(order_by = total, n = top_n) %>%
+        ungroup() %>%
+        mutate(bar_group = reorder_within(bar_group, total, facet_var))
+      
+    } else if (typeof(facet_values) == "double") {
+      data <- data %>%
+        group_by(facet_var) %>%
+        mutate(total = sum(quantity, na.rm = TRUE)) %>%
+        ungroup()
+      
+      top_n_value <- data %>%
+        select(total) %>%
+        distinct() %>%
+        arrange(desc(total)) %>%
+        slice_max(order_by = total, n = facet_values) %>%
+        pull(total) %>%
+        min()
+      
+      data <- data %>%
+        filter(total >= top_n_value) %>%
+        group_by(facet_var) %>%
+        slice_max(order_by = quantity, n = top_n) %>%
+        ungroup() %>%
+        mutate(bar_group = reorder_within(bar_group, quantity, facet_var))
+      
+      }
+    } else if (is.na(facet_variable)) {
+      # Summarizing for top n variables
+      data <- data %>%
+        group_by(bar_group) %>%
+        mutate(total = sum(quantity, na.rm = TRUE)) %>%
+        ungroup()
+      
+      # Top N bars in the bar chart
+      top_n_value <- data %>%
+        select(bar_group, total) %>%
+        distinct() %>%
+        slice_max(order_by = total, n = top_n) %>%
+        pull(total) %>%
+        min()
+      
+      data <- data %>%
+        filter(total >= top_n_value) %>%
+        mutate(bar_group = reorder(bar_group, total))
+    } else {
+      warning("entered invalid facet values")
+      return(NULL)
+    }
+  
   
   # Bar Chart Creation----------------------------------------------------------
   
@@ -189,7 +205,7 @@ plot_bar <- function(data,
   
   if (!is.na(facet_variable)) {
     p <- p +
-      facet_wrap(as.formula(paste(".~", "facet_variable")), scales = "free") +
+      facet_wrap(as.formula(paste(".~", "facet_var")), scales = "free") +
       tidytext::scale_y_reordered()
   }
   

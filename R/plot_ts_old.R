@@ -9,9 +9,10 @@
 #' @param legend.title text for the color or fill legend label. 
 #' @param plot.title text for the plot title. 
 #' @param facet_variable variable name to facet by.
-#' @param facet_values number of facets or vector of facet categories to include. Must be specifid if a facet_variable is specified. 
+#' @param facet_n number of facets to include. Must be specifid if a facet_variable is specified. 
 #' @import tidyverse
 #' @import countrycode
+#' @import viridis
 #' @export
 plot_ts <- function(data, 
                     artis_var = NA, 
