@@ -32,7 +32,7 @@ Then, you can run
 devtools::install_github("Seafood-Globalization-Lab/exploreARTIS", dependencies = TRUE)
 ```
 
-After you install the exploreARTIS package, you can just load it with library(exploreARTIS). You will also need to reinstall the package whenever there are updates to the package code.
+After you install the exploreARTIS package, you can just load it with `library(exploreARTIS)`. You will also need to reinstall the package whenever there are updates to the package code.
 
 ## ARTIS data structure
 
