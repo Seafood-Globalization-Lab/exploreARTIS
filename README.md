@@ -73,7 +73,7 @@ Here are examples of all the types of plots that can be created with this packag
 
 ### Bar charts
 
-`r plt_bar()` creates ranked bar plots, with bar categories indicated by the `r bar_group` argument. The number of bars to display can be controlled with `r top_n`. argument. 
+`plot_bar()` creates ranked bar plots, with bar categories indicated by the `bar_group` argument. The number of bars to display can be controlled with `top_n`. argument. 
 
 ```r
 # loading library
@@ -101,7 +101,7 @@ plot_bar(mini_artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
 
 ### Line and area plots
 
-`r plot_ts()` creates time series line or area plots for any specified `r artis_var`. The `r plot.type` argument allows options of "line" (default) or "stacked" to change plot views. To keep the number of colors reasonable, the `r prop_flow_cutoff` argument groups lines falling below the cut-off into "other" and this can be adjusted to show more or fewer lines/fills. 
+`plot_ts()` creates time series line or area plots for any specified `artis_var`. The `plot.type` argument allows options of "line" (default) or "stacked" to change plot views. To keep the number of colors reasonable, the `prop_flow_cutoff` argument groups lines falling below the cut-off into "other" and this can be adjusted to show more or fewer lines/fills. 
 
 ```r
 # loading library
@@ -128,7 +128,7 @@ plot_ts(mini_artis, artis_var = "exporter_iso3c", plot.type = "stacked")
 
 ### Sankey plots
 
-`r plot_sankey()` creates a sankey plot to display flows among nodes across columns. This function is flexible in allowing the user to specify which data columns should be used to produce the colunns of the sankey plot. This function includes the argument `r prop_flow_cutoff` to control how many groups are included in "other" (which can help keep the larger flows readable). It also includes an argumen to drop the group "other" entirely if preferred. 
+`plot_sankey()` creates a sankey plot to display flows among nodes across columns. This function is flexible in allowing the user to specify which data columns should be used to produce the colunns of the sankey plot. This function includes the argument `prop_flow_cutoff` to control how many groups are included in "other" (which can help keep the larger flows readable). It also includes an argumen to drop the group "other" entirely if preferred. 
 
 ```r
 # loading library
@@ -156,7 +156,7 @@ plot_chord(mini_artis, region_colors = region7_palette)
 ```
 ![Chord Diagram - all seafood trade](images/all_trade_chord.png)
 
-Individual countries can be pulled out to highlight their trade by specifying the country/countries' iso3c code(s) in the `r focal_country` argument. 
+Individual countries can be pulled out to highlight their trade by specifying the country/countries' iso3c code(s) in the `focal_country` argument. 
 
 ```r
 # loading library
@@ -169,7 +169,7 @@ plot_chord(mini_artis, focal_country = "VNM", region_colors = region7_palette)
 
 ### Chloropleth and flow arrow maps 
 
-`r plot_map()` creates maps that are optionally colored by `r country_fill` and optionally include flow arrows colored by flow volume with `r flow_arrows`. The number of arrows can be specified with `r n_flows`. 
+`plot_map()` creates maps that are optionally colored by `country_fill` and optionally include flow arrows colored by flow volume with `flow_arrows`. The number of arrows can be specified with `n_flows`. 
 
 ```r
 # loading library
@@ -199,7 +199,7 @@ mini_artis %>% filter(exporter_iso3c == "CHL") %>% plot_map(country_fill = "impo
 
 ### Facetting
 
-Both `r plot_ts` and `r plot_bar` allow facetting by an ARTIS variable with the `r facet_variable` argument. If a facet variable is specified then `r facet_values` must also be defined, either as a number (the number of facets to create) or a vector (the specific facets to create). 
+Both `plot_ts()` and `r plot_bar()` allow facetting by an ARTIS variable with the `facet_variable` argument. If a facet variable is specified then `facet_values` must also be defined, either as a number (the number of facets to create) or a vector (the specific facets to create). 
 
 ```r
 # loading libraries
