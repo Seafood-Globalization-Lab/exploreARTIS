@@ -1,6 +1,6 @@
 # exploreARTIS
 
-The `exploreARTIS` R package provides functions for filtering and visualizing trade and consumption data from the ARTIS (Aquatic Resource Trade In Species) database. This package is designed to facilitate a streamlined investigation and visualization of the ARTIS database. 
+The `exploreARTIS` R package provides functions for filtering and visualizing trade and consumption data from the ARTIS (Aquatic Resource Trade In Species) database. This package is designed to facilitate a streamlined investigation and visualization of the ARTIS database. Most functions are wrappers for `ggplot2::ggplot()` and can accept additional grobs to further customize the figures, with the exception of `exploreARTIS::plot_sankey()` which is based on 
 
 ## Installation
 
@@ -54,7 +54,7 @@ ARTIS data consists of the following variables:
 ## Filtering ARTIS Data
 
 ### Bulk ARTIS data
-If you have downloaded bulk ARTIS data, it is generally split into separate csv files for each HS version and year combination. This is because the combined file is large and slow to load, sometimes causing users' R sessions to crash. If you would like to combine files into a single data frame, you will need to pick which HS version-year combinations you would like to include. Then, you can decide if you would like to filter down any of the variabales (e.g., keep select exporters, species, etc.). Once you have made these decisions, you can use the example script `scripts/filter_bulk_artis.R` as a starting place to loop through the desired ARTIS files and filter based on your specified criteria. Note that this is not a function, but rather an example script with comments to facilitate customization for your own project. 
+If you have downloaded bulk ARTIS data, it is generally split into separate csv files for each HS version and year combination. This is because the combined file is large and slow to load, sometimes causing users' R sessions to crash. If you would like to combine files into a single data frame, you will need to pick which HS version-year combinations you would like to include. Then, you can decide if you would like to filter down any of the variabales (e.g., keep select exporters, species, etc.). Once you have made these decisions, you can use the example script `scripts/filter_bulk_artis.R` as a starting place to loop through the desired ARTIS files and filter based on your specified criteria. **Note** that this is not a function, but rather an example script with comments to facilitate customization for your own project. 
 
 ### ARTIS data frames for visualization
 Once you have the ARTIS data frame you are using for your analysis, you may still want to filter it for specific visualizations. For example, you may be working with all trade for a given country but want to generate a plot for just one species. You can of course use any base R or tidyverse functions to filter the data, but we also provide a function in this package to filter any of the ARTIS variables: `filter_artis()`. The filtered data frame can then be passed to any visualization function. 
