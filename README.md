@@ -206,7 +206,7 @@ plot_ts(mini_artis, artis_var = "importer_iso3c", plot.type = "stacked", facet_v
 ```
 
 <p align="center">
-  <img src="images/area_plot_facetted.png" alt="drawing" width="75%"/>
+  <img src="images/area_plot_facetted.png" alt="drawing" width="50%"/>
 </p>
 
 ```r
@@ -218,7 +218,7 @@ plot_bar(mini_artis, bar_group = "importer_iso3c", facet_variable = "method", fa
 ```
 
 <p align="center">
-  <img src="images/bar_plot_facetted.png" alt="drawing" width="75%"/>
+  <img src="images/bar_plot_facetted.png" alt="drawing" width="50%"/>
 </p>
 
 
