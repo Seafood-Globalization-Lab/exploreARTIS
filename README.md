@@ -69,7 +69,7 @@ filter_artis(mini_artis, year = 2016:2020, exporter = "CHL", species = "salmo sa
 
 ## Visualization Examples
 
-Here are examples of all the types of plots that can be created with this package. (Assume that "mini_artis" in these examples is a variable that contains an ARTIS dataset). 
+Here are examples of all types of plots that can be created with this package. `mini_artis` is dataframe with a subset of ARTIS data that is included in the `exploreARTIS` package. 
 
 ### Bar charts
 
