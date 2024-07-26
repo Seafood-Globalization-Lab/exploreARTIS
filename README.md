@@ -1,6 +1,6 @@
 # exploreARTIS
 
-The `exploreARTIS` R package provides functions for filtering and visualizing trade and consumption data from the ARTIS (Aquatic Resource Trade In Species) database. This package is designed to facilitate a streamlined investigation and visualization of the ARTIS database. Most functions are wrappers for `ggplot2::ggplot()` and can accept additional layers to further customize the figures, with the exception of `exploreARTIS::plot_sankey()` which is based on `ggsankey`. 
+The `exploreARTIS` R package provides functions for filtering and visualizing trade and consumption data from the ARTIS (Aquatic Resource Trade In Species) database. This package is designed to facilitate and streamline investigation of the ARTIS database. Most functions are wrappers for `ggplot2::ggplot()` and can accept additional layers to further customize the figures, with the exception of `exploreARTIS::plot_sankey()` which is based on `ggsankey`. 
 
 ## Installation
 
