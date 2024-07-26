@@ -51,7 +51,7 @@ ARTIS data consists of the following variables:
 - `hs_version` (string): version of HS codes
 - `year` (double): Year
 
-## Filtering ARTIS data
+## Filtering ARTIS Data
 
 ### Bulk ARTIS data
 If you have downloaded bulk ARTIS data, it is generally split into separate csv files for each HS version and year combination. This is because the combined file is large and slow to load, sometimes causing users' R sessions to crash. If you would like to combine files into a single data frame, you will need to pick which HS version-year combinations you would like to include. Then, you can decide if you would like to filter down any of the variabales (e.g., keep select exporters, species, etc.). Once you have made these decisions, you can use the example script "scripts/filter_bulk_artis.R" as a starting place to loop through the desired ARTIS files and filter based on your specified criteria. Note that this is not a function, but rather an example script with comments to facilitate customization for your own project. 
@@ -67,7 +67,7 @@ library(exploreARTIS)
 filter_artis(mini_artis, year = 2016:2020, exporter = "CHL", species = "salmo salar")
 ```
 
-## Visualization examples
+## Visualization Examples
 
 Here are examples of all the types of plots that can be created with this package. (Assume that "mini_artis" in these examples is a variable that contains an ARTIS dataset). 
 
