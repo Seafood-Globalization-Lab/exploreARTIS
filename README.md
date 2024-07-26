@@ -78,7 +78,9 @@ library(exploreARTIS)
 # Bar chart visualizing seafood trade volumes by exporter
 plot_bar(mini_artis, bar_group = "exporter_iso3c")
 ```
-![Bar Chart - by exporter](images/all_trade_export_bar.png)
+<p align="center">
+  <img src="images/all_trade_export_bar.png" alt="drawing" width="50%"/>
+</p>
 
 Bar charts can optionally be filled by an ARTIS variable. 
 
@@ -89,8 +91,9 @@ library(exploreARTIS)
 # Bar chart visualizing seafood trade volumes by exporter and filling by export source
 plot_bar(mini_artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
 ```
-![Bar Chart - by exporter and dom_source](images/all_trade_export_dom_source_bar.png)
-
+<p align="center">
+  <img src="images/all_trade_export_dom_source_bar.png" alt="drawing" width="50%"/>
+</p>
 
 ### Line and area plots
 
@@ -102,7 +105,10 @@ library(exploreARTIS)
 
 plot_ts(mini_artis, artis_var = "exporter_iso3c")
 ```
-![Line Graph - all seafood trade, exporters](images/line_all_trade.png)
+
+<p align="center">
+  <img src="images/line_all_trade.png" alt="drawing" width="50%"/>
+</p>
 
 A stacked line graph of all export partners in the ARTIS dataset
 ```r
@@ -111,7 +117,10 @@ library(exploreARTIS)
 
 plot_ts(mini_artis, artis_var = "exporter_iso3c", plot.type = "stacked")
 ```
-![Stacked Line Graph - all seafood trade, exporters](images/line_stacked_all_trade.png)
+
+<p align="center">
+  <img src="images/line_stacked_all_trade.png" alt="drawing" width="50%"/>
+</p>
 
 ### Sankey plots
 
@@ -125,7 +134,10 @@ library(exploreARTIS)
 plot_sankey(mini_artis, cols = c("sciname", "exporter_iso3c", "importer_iso3c"))
 
 ```
-![Sankey Plot - all seafood trade](images/sankey_all_trade.png)
+
+<p align="center">
+  <img src="images/sankey_all_trade.png" alt="drawing" width="50%"/>
+</p>
 
 # Chord diagrams
 
@@ -162,7 +174,10 @@ library(exploreARTIS)
 # Map of top seafood exports and flows
 plot_map(mini_artis, country_fill = "importer_iso3c", flow_arrows = TRUE, arrow_label = "Trade (live t)", fill_label = "Import (live t)")
 ```
-![Map - All seafood trade](images/all_map_flows.png)
+
+<p align="center">
+  <img src="images/all_map_flows.png" alt="drawing" width="75%"/>
+</p>
 
 Individual country's trade flows can be isolated by filtering the importer or exporter column before passing it to the plot function. 
 
@@ -173,7 +188,10 @@ library(exploreARTIS)
 # Map of seafood exports from Chile
 mini_artis %>% filter(exporter_iso3c == "CHL") %>% plot_map(country_fill = "importer_iso3c", flow_arrows = TRUE, arrow_label = "Trade (live t)", fill_label = "Import (live t)")
 ```
-![Map - Seafood exports from Chile](images/chl_map_flows.png)
+
+<p align="center">
+  <img src="images/chl_map_flows.png" alt="drawing" width="75%"/>
+</p>
 
 ### Facetting
 
@@ -187,8 +205,9 @@ library(exploreARTIS)
 plot_ts(mini_artis, artis_var = "importer_iso3c", plot.type = "stacked", facet_variable = "method", facet_values = c("capture", "aquaculture"))
 ```
 
-![Area plot - Top importers facetted by method](images/area_plot_facetted.png)
-
+<p align="center">
+  <img src="images/area_plot_facetted.png" alt="drawing" width="75%"/>
+</p>
 
 ```r
 # loading libraries
@@ -198,6 +217,8 @@ library(exploreARTIS)
 plot_bar(mini_artis, bar_group = "importer_iso3c", facet_variable = "method", facet_values = c("capture", "aquaculture"))
 ```
 
-![Bar plot - Top importers facetted by method](images/bar_plot_facetted.png)
+<p align="center">
+  <img src="images/bar_plot_facetted.png" alt="drawing" width="75%"/>
+</p>
 
 
