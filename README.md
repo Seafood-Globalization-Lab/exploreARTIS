@@ -1,6 +1,6 @@
 # exploreARTIS
 
-The `exploreARTIS` R package provides tools for analyzing and visualizing trade and consumption data from the ARTIS (Aquatic Resource Trade In Species) database. This package is designed to facilitate a streamlined investigation and visualization of the ARTIS database. 
+The `exploreARTIS` R package provides functions for filtering and visualizing trade and consumption data from the ARTIS (Aquatic Resource Trade In Species) database. This package is designed to facilitate a streamlined investigation and visualization of the ARTIS database. 
 
 ## Installation
 
