@@ -6,55 +6,26 @@
 \usage{
 plot_map(
   data,
-  species = NA,
-  years = NA,
-  regions = NA,
-  producers = NA,
-  exporters = NA,
-  importers = NA,
-  hs_codes = NA,
-  prod_method = NA,
-  prod_environment = NA,
-  export_source = NA,
-  weight = "live",
+  value = "live_weight_t",
   country_fill = NA,
   flow_arrows = FALSE,
   n_flows = 10,
   arrow_label = NA,
   fill_label = NA,
-  caption_label = NA
+  caption_label = NA,
+  regions = FALSE
 )
 }
 \arguments{
 \item{data}{an ARTIS dataframe.}
 
-\item{species}{list of species/species groups to include, default NA - includes all species.}
-
-\item{years}{list of years to include, default NA - includes all years.}
-
-\item{producers}{list of producers (as iso3 codes) to include, default NA - includes all producers.}
-
-\item{exporters}{list of exporters (as iso3 codes) to include, default NA - includes all exporters.}
-
-\item{importers}{list of importers (as iso3 codes) to include, default NA - includes all importers.}
-
-\item{hs_codes}{list of hs level 6 codes to include, default NA - includes all hs6 codes.}
-
-\item{prod_method}{list of production methods (capture, aquaculture, or unknown), default NA - includes all production methods.}
-
-\item{prod_environment}{list of environments (marine, inland, or unknown), default NA - includes all environments}
-
-\item{export_source}{list of types of export (domestic export, foreign export, or error export), default NA - all export sources.}
-
-\item{weight}{trade quantity type to visualize ("live" for live weight or "product" for product weight), default "live."}
+\item{value}{the numeric variable for the fill/color. Default is live_weight_t.}
 
 \item{country_fill}{optional variable by which to color countries - either "import" to color by total imports or export to color by total export.}
 
 \item{flow_arrows}{logical variable - set to TRUE to include top trade flow arrows.}
 
 \item{n_flows}{number of top trade flow arrows to include if flow_arrows = TRUE - defaults to 10.}
-
-\item{region}{logical. Whether to group countries by region.}
 }
 \value{
 None

@@ -15,7 +15,7 @@ plot_bar(
   fill.lab = "",
   plot.title = "",
   facet_variable = NA,
-  facet_n = NA
+  facet_values = NA
 )
 }
 \arguments{
@@ -39,7 +39,7 @@ plot_bar(
 
 \item{facet_variable}{character. Column name to facet by.}
 
-\item{facet_n}{numeric. Number of facets to include. Must be specified if a facet_variable is specified.}
+\item{facet_values}{number of facets or vector of facet categories to include. Must be specifid if a facet_variable is specified.}
 }
 \description{
 Function that creates a horizontal bar chart for ARTIS or consumption data.
@@ -60,6 +60,6 @@ plot_bar(mini_artis,
 plot_bar(mini_artis, 
         bar_group = "importer_iso3c", 
         facet_variable  = "habitat", 
-        facet_n = 3)
+        facet_values = 3)
 
 }

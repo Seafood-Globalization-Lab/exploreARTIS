@@ -30,13 +30,13 @@ plot_ts(
 
 \item{facet_variable}{variable name to facet by.}
 
+\item{facet_values}{number of facets or vector of facet categories to include. Must be specifid if a facet_variable is specified.}
+
 \item{y.lab}{text for the y-axis label.}
 
 \item{legend.title}{text for the color or fill legend label.}
 
 \item{plot.title}{text for the plot title.}
-
-\item{facet_n}{number of facets to include. Must be specifid if a facet_variable is specified.}
 }
 \description{
 Creates a time series line graph/stacked area graph
