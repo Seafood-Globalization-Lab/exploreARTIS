@@ -2,9 +2,10 @@
 
 # loading library
 library(exploreARTIS)
+library(ggplot2)
+library(forcats)
 
-# Load environment variables
-load("R/sysdata.rda")
+
 
 # Bar chart visualizing seafood trade volumes by exporter
 p <- plot_bar(mini_artis, bar_group = "exporter_iso3c")
@@ -43,15 +44,17 @@ dev.off()
 
 
 # Map of global seafood exports 
-p <- plot_map(mini_artis, country_fill = "importer_iso3c", flow_arrows = TRUE)
+p <- plot_map(mini_artis, country_fill = "importer_iso3c", flow_arrows = TRUE, arrow_label = "Trade (live t)", fill_label = "Import (live t)")
 ggsave(filename = "images/all_map_flows.png", p)
 
 
 # Map of seafood exports from Chile
-p <- mini_artis %>%
+p <- mini_artis %>% 
   filter(exporter_iso3c == "CHL") %>%
-  plot_map(country_fill = "importer_iso3c", flow_arrows = TRUE, 
-           arrow_label = "Trade (live t)", fill_label = "Import (live t)")
+  plot_map(country_fill = "importer_iso3c", 
+           flow_arrows = TRUE, 
+           arrow_label = "Trade (live t)", 
+           fill_label = "Import (live t)")
 ggsave(filename = "images/chl_map_flows.png", p)
 
 
