@@ -29,7 +29,8 @@ library(devtools)
 
 Then, you can run 
 ```r 
-devtools::install_github("Seafood-Globalization-Lab/exploreARTIS", dependencies = TRUE)
+devtools::install_github("Seafood-Globalization-Lab/exploreARTIS@v1.0.0", dependencies = TRUE)
+# @v1.0.0 indicates the released version of the package. 
 ```
 
 After you install the exploreARTIS package, you can just load it with `library(exploreARTIS)`. You will also need to reinstall the package whenever there are updates to the package code.
