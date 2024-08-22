@@ -65,7 +65,10 @@ Once you have the ARTIS data frame you are using for your analysis, you may stil
 library(exploreARTIS)
 
 # Filter ARTIS data to Chilean exports of Atlantic salmon in 2016-2020
-filter_artis(mini_artis, year = 2016:2020, exporter = "CHL", species = "salmo salar")
+filter_artis(mini_artis,
+              year = 2016:2020,
+              exporter = "CHL",
+              species = "salmo salar")
 ```
 
 ## Visualization Examples
@@ -81,7 +84,8 @@ Here are examples of all types of plots that can be created with this package. `
 library(exploreARTIS)
 
 # Bar chart visualizing seafood trade volumes by exporter
-plot_bar(mini_artis, bar_group = "exporter_iso3c")
+plot_bar(mini_artis,
+          bar_group = "exporter_iso3c")
 ```
 <p align="center">
   <img src="images/all_trade_export_bar.png" alt="drawing" width="50%"/>
@@ -94,7 +98,9 @@ Bar charts can optionally be filled by an ARTIS variable.
 library(exploreARTIS)
 
 # Bar chart visualizing seafood trade volumes by exporter and filling by export source
-plot_bar(mini_artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
+plot_bar(mini_artis,
+        bar_group = "exporter_iso3c",
+        fill_type = "dom_source")
 ```
 <p align="center">
   <img src="images/all_trade_export_dom_source_bar.png" alt="drawing" width="50%"/>
@@ -108,7 +114,8 @@ plot_bar(mini_artis, bar_group = "exporter_iso3c", fill_type = "dom_source")
 # loading library
 library(exploreARTIS)
 
-plot_ts(mini_artis, artis_var = "exporter_iso3c")
+plot_ts(mini_artis,
+        artis_var = "exporter_iso3c")
 ```
 
 <p align="center">
@@ -120,7 +127,9 @@ A stacked line graph of all export partners in the ARTIS dataset
 # loading library
 library(exploreARTIS)
 
-plot_ts(mini_artis, artis_var = "exporter_iso3c", plot.type = "stacked")
+plot_ts(mini_artis,
+        artis_var = "exporter_iso3c",
+        plot.type = "stacked")
 ```
 
 <p align="center">
@@ -136,7 +145,8 @@ plot_ts(mini_artis, artis_var = "exporter_iso3c", plot.type = "stacked")
 library(exploreARTIS)
 
 # Sankey plot of all seafood trade
-plot_sankey(mini_artis, cols = c("sciname", "exporter_iso3c", "importer_iso3c"))
+plot_sankey(mini_artis,
+            cols = c("sciname", "exporter_iso3c", "importer_iso3c"))
 
 ```
 
@@ -146,14 +156,15 @@ plot_sankey(mini_artis, cols = c("sciname", "exporter_iso3c", "importer_iso3c"))
 
 ### Chord diagrams
 
-`r plot_chord()` creates a chord diagram for visualizing flows among countries/regions. 
+`plot_chord()` creates a chord diagram for visualizing flows among countries/regions. 
 
 ```r
 # loading library
 library(exploreARTIS)
 
 # Chord diagram of all seafood trade
-plot_chord(mini_artis, region_colors = region7_palette)
+plot_chord(mini_artis,
+          region_colors = region7_palette)
 ```
 ![Chord Diagram - all seafood trade](images/all_trade_chord.png)
 
@@ -164,7 +175,9 @@ Individual countries can be pulled out to highlight their trade by specifying th
 library(exploreARTIS)
 
 # Chord diagram of all seafood trade with Vietnam highlighted
-plot_chord(mini_artis, focal_country = "VNM", region_colors = region7_palette)
+plot_chord(mini_artis,
+          focal_country = "VNM",
+          region_colors = region7_palette)
 ```
 ![Chord Diagram - all seafood trade](images/all_trade_chord_vnm.png)
 
@@ -177,7 +190,11 @@ plot_chord(mini_artis, focal_country = "VNM", region_colors = region7_palette)
 library(exploreARTIS)
 
 # Map of top seafood exports and flows
-plot_map(mini_artis, country_fill = "importer_iso3c", flow_arrows = TRUE, arrow_label = "Trade (live t)", fill_label = "Import (live t)")
+plot_map(mini_artis,
+        country_fill = "importer_iso3c",
+        flow_arrows = TRUE,
+        arrow_label = "Trade (live t)",
+        fill_label = "Import (live t)")
 ```
 
 <p align="center">
@@ -191,7 +208,11 @@ Individual country's trade flows can be isolated by filtering the importer or ex
 library(exploreARTIS)
 
 # Map of seafood exports from Chile
-mini_artis %>% filter(exporter_iso3c == "CHL") %>% plot_map(country_fill = "importer_iso3c", flow_arrows = TRUE, arrow_label = "Trade (live t)", fill_label = "Import (live t)")
+mini_artis %>% filter(exporter_iso3c == "CHL") %>%
+                plot_map(country_fill = "importer_iso3c",
+                          flow_arrows = TRUE,
+                          arrow_label = "Trade (live t)",
+                          fill_label = "Import (live t)")
 ```
 
 <p align="center">
@@ -207,7 +228,11 @@ Both `plot_ts()` and `r plot_bar()` allow facetting by an ARTIS variable with th
 library(exploreARTIS)
 
 # Area plot of top importers facetted by method
-plot_ts(mini_artis, artis_var = "importer_iso3c", plot.type = "stacked", facet_variable = "method", facet_values = c("capture", "aquaculture"))
+plot_ts(mini_artis,
+        artis_var = "importer_iso3c",
+        plot.type = "stacked",
+        facet_variable = "method",
+        facet_values = c("capture", "aquaculture"))
 ```
 
 <p align="center">
@@ -219,7 +244,10 @@ plot_ts(mini_artis, artis_var = "importer_iso3c", plot.type = "stacked", facet_v
 library(exploreARTIS)
 
 # Bar plot of top importers facetted by method
-plot_bar(mini_artis, bar_group = "importer_iso3c", facet_variable = "method", facet_values = c("capture", "aquaculture"))
+plot_bar(mini_artis,
+        bar_group = "importer_iso3c",
+        facet_variable = "method",
+        facet_values = c("capture", "aquaculture"))
 ```
 
 <p align="center">
