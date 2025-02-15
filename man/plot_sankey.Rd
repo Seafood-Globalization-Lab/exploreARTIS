@@ -7,6 +7,7 @@
 plot_sankey(
   data,
   cols = c("source_country_iso3c", "exporter_iso3c", "importer_iso3c"),
+  cols_labels = c("Source", "Exporter", "Importer"),
   prop_flow_cutoff = 0.05,
   value = "live_weight_t",
   show.other = TRUE,
@@ -16,7 +17,9 @@ plot_sankey(
 \arguments{
 \item{data}{dataframe. An ARTIS trade or consumption dataframe.}
 
-\item{cols}{vector. Column names to generate the sections of the Sankey plot, in the order they should appear (left to right).}
+\item{cols}{character vector. Column names to generate the sections of the Sankey plot, in the order they should appear (left to right).}
+
+\item{cols_labels}{character vector. User-specified labels for the columns selected with cols argument.}
 
 \item{prop_flow_cutoff}{integer. A percent in which trade volumes that comprise less than x\% of the total trade are renamed as "Other". Default prop_flow_cutoff = 0.05 means trade volumes less than 5\% are labeled as "Other".}
 
