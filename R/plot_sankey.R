@@ -3,7 +3,8 @@
 #' A function to create a Sankey plot showcasing elements of seafood supply chains in ARTIS or consumption datasets.
 #' 
 #' @param data dataframe. An ARTIS trade or consumption dataframe.
-#' @param cols vector. Column names to generate the sections of the Sankey plot, in the order they should appear (left to right).
+#' @param cols character vector. Column names to generate the sections of the Sankey plot, in the order they should appear (left to right).
+#' @param cols_labels character vector. User-specified labels for the columns selected with cols argument.
 #' @param prop_flow_cutoff integer. A percent in which trade volumes that comprise less than x\% of the total trade are renamed as "Other". Default prop_flow_cutoff = 0.05 means trade volumes less than 5\% are labeled as "Other".
 #' @param value character. Trade quantity column name to visualize. Default is "live_weight_t".
 #' @param show.other logical. Controls whether or not nodes within a column falling below the prop_flow_cutoff threshold should be displayed in a group ("Other"). Default value is TRUE, filtering for threshold occurs regardless if "Other" is displayed.
@@ -33,6 +34,9 @@ plot_sankey <- function(data,
                         cols = c("source_country_iso3c", 
                                  "exporter_iso3c", 
                                  "importer_iso3c"), 
+                        cols_labels = c("Source", 
+                                        "Exporter", 
+                                        "Importer"),
                         prop_flow_cutoff = 0.05, 
                         value = "live_weight_t", 
                         show.other = TRUE, 
@@ -43,24 +47,32 @@ plot_sankey <- function(data,
     warning("WARNING: The selected columns include NA values")
   }
   
-  # Setting up parameters based on user input-----------------------------------
+  if(length(cols) != length(cols_labels)){
+    stop("cols and cols_labels must be the same length")
+  }
   
-  # Assign weight column to quantity
-  quantity <- value
+  # Setting up parameters based on user input-----------------------------------
 
-  # Summarizing data based on quantity variable selected
+  # Summarizing data based on value variable selected
+  
+  # FIXIT:
+  # links <- data %>%
+  #   group_by_at(vars(cols)) %>% # vars() deprecated
+  #   summarize(total_q = sum(.data[[value]], na.rm = TRUE))
+  
+  ### FIXIT: AM new code to replace vars() for testing later
   links <- data %>%
-    group_by_at(vars(cols)) %>% # vars() deprecated
-    summarize(total_q = sum(.data[[quantity]], na.rm = TRUE))
+    group_by(across(all_of(cols))) %>%  # Replaces vars()
+    summarize(total_q = sum(.data[[value]], na.rm = TRUE), .groups = "drop")
 
   # Rename specified columns to generic names for processing
   colnames(links) <- c(paste("col_", 1:length(cols), sep = ""), "total_q")
-  cols <- colnames(links)[1:length(cols)]
+  cols_standard <- colnames(links)[1:length(cols)]
 
   # Identify list of nodes by column by proportional flow cutoff
   node_names <- c()
   
-  for(i in 1:length(cols)){
+  for(i in 1:length(cols_standard)){
     # Identify nodes in the column falling below the threshold
     node_i <- links %>%
       rename(col_i = paste("col_", i, sep = "")) %>%
@@ -105,12 +117,14 @@ plot_sankey <- function(data,
   
   sankey_df <- links %>%
     # Filtering data based on prop flow cutoff - use show.other value 
-    filter_at(vars(cols), all_vars(. %in% node_names)) %>%
-    ungroup()
+    filter_at(vars(cols_standard), all_vars(. %in% node_names)) %>%
+    ungroup() 
+  
+  names(sankey_df) <- c(cols_labels, "total_q")
   
   sankey_df <- sankey_df %>%
     # Transforming into ggsankey format (x, node, next_x, next_node)
-    ggsankey::make_long({{ cols }}, value = total_q)
+    ggsankey::make_long({{ cols_labels }}, value = total_q)
   
   num_nodes <- length(unique(c(sankey_df$node,sankey_df$next_node)))
   
@@ -130,6 +144,6 @@ plot_sankey <- function(data,
     labs(x = NULL, title = plot.title) +
     theme(
       legend.position = "none",
-      axis.text.x = element_text()
+      axis.text.x = element_text(size = 12)
     )
 }
