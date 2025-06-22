@@ -249,9 +249,110 @@ plot_bar(mini_artis,
         facet_variable = "method",
         facet_values = c("capture", "aquaculture"))
 ```
-
 <p align="center">
   <img src="images/bar_plot_facetted.png" alt="drawing" width="50%"/>
 </p>
+
+
+## Beta Version: Building a DuckDB Database from KNB Resource Map
+
+As a powerful addition to the `exploreARTIS` toolkit, we provide a new experimental function: `process_knb_to_duckdb()`. This function is designed to streamline the **extraction, transformation, and storage** of ARTIS and related data from [KNB (Knowledge Network for Biocomplexity)](https://knb.ecoinformatics.org/) into a fast and lightweight **[DuckDB](https://duckdb.org/)** database for analysis.
+
+### What is DuckDB?
+
+[**DuckDB**](https://duckdb.org/) is an **in-process SQL OLAP database management system** — think of it as SQLite for analytics. It is designed for speed, portability, and ease of use, especially with columnar data and Parquet/CSV formats. DuckDB is ideal for local, analytical queries and works seamlessly with R, Python, and other modern data tools.
+
+**Why DuckDB?**
+
+* **No server needed** — it runs in-process.
+* **Fast analytics** — optimized for vectorized execution and columnar storage.
+* **Native support for Parquet/CSV** — perfect for working with ARTIS and KNB data.
+* **Portable** — single-file `.duckdb` database makes sharing easy.
+
+> **Note:** DuckDB integration is currently **experimental** for this package. We welcome feedback and contributions!
+
+---
+
+### Function: `process_knb_to_duckdb()`
+
+This function pulls a **KNB resource map**, downloads the data files (CSV/Parquet), extracts them, and builds a **DuckDB database**. It optionally filters ARTIS trade and consumption data by HS version and year, and generates a `metadata` table to describe all ingested tables.
+
+#### Usage
+
+```r
+process_knb_to_duckdb(
+  resource_map_id = "resource_map_urn:uuid:...",     # required
+  duckdb_name = "ARTIS_SAU.duckdb",                  # optional, default name
+  directory = "data_knb",                            # local folder to save files
+  timeout_seconds = 600,                             # optional timeout for downloads
+  wait_minutes = 1,                                  # optional pause between download and ingest
+  artis_custom_timeseries = TRUE,                    # whether to filter ARTIS tables
+  hs_version_filter = c("HS_2012"),                  # optional HS versions to keep
+  year_filter = 2015:2020                            # optional year range
+)
+```
+
+---
+
+### Parameters
+
+| Argument                  | Type               | Description                                                                                        |
+| ------------------------- | ------------------ | -------------------------------------------------------------------------------------------------- |
+| `resource_map_id`         | `character`        | **REQUIRED.** The KNB resource map ID (e.g., `"resource_map_urn:uuid:..."`) to download data from. |
+| `duckdb_name`             | `character`        | Optional. The name of the DuckDB file to create. Default is `"ARTIS_SAU.duckdb"`.                  |
+| `directory`               | `character`        | Directory where all files will be downloaded and unzipped. Must be writeable.                      |
+| `timeout_seconds`         | `numeric`          | Timeout in seconds for download requests. Default is `600`.                                        |
+| `wait_minutes`            | `numeric`          | Optional pause time (in minutes) after download, before ingestion begins. Default is `1`.          |
+| `artis_custom_timeseries` | `logical`          | If `TRUE`, will apply filtering to ARTIS tables (`trade`, `consumption`) by HS version and year.   |
+| `hs_version_filter`       | `character vector` | HS version(s) to retain (e.g., `"HS_2012"`). Used only if filtering is enabled.                    |
+| `year_filter`             | `numeric vector`   | Year(s) to retain (e.g., `2015:2020`). Used only if filtering is enabled.                          |
+
+---
+
+### Outputs
+
+* A **`.duckdb`** database file is saved to disk at the path specified by `duckdb_name`.
+* Includes the following tables if present in the KNB dataset:
+
+  * `trade` – ARTIS trade flows
+  * `consumption` – ARTIS consumption estimates
+  * `baci` – BACI bilateral trade
+  * `code_max_resolved` – Taxonomic resolution table
+  * `countries` – Country reference
+  * `products` – Product reference
+  * `sciname` – Species names
+  * `metadata` – Table names and descriptions for reference
+
+---
+
+### Example Workflow
+
+```r
+# Load exploreARTIS if needed
+library(exploreARTIS)
+
+# Run the DuckDB builder
+process_knb_to_duckdb(
+  resource_map_id = "resource_map_urn:uuid:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  directory = "data_knb",
+  artis_custom_timeseries = TRUE,
+  hs_version_filter = c("HS_2012"),
+  year_filter = 2015:2020
+)
+```
+
+---
+
+### Notes
+
+* If running this on a new machine, ensure the following R packages are installed:
+
+  * `dataone`, `datapack`, `duckdb`, `arrow`, `utils`, `tools`
+* The script automatically handles zipped files and skips files larger than 50MB from API download (downloads them via direct HTTP).
+* Use [DuckDB CLI](https://duckdb.org/docs/installation/) or the `duckdb` R package to explore the generated database.
+
+
+
+
 
 
