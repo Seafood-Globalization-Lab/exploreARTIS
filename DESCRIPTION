@@ -1,7 +1,7 @@
 Package: exploreARTIS
 Type: Package
 Title: Analyze and Visualize ARTIS data
-Version: 0.1.0
+Version: 1.1.0 alpha
 Author: Rahul Agrawal Bejarano, Kelvin Gorospe, Jessica Gephart
 Maintainer: The package maintainer <jgephart@american.edu>
 Description: Functions to explore, summarize and visualize ARTIS data.
