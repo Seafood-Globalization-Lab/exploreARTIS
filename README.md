@@ -26,14 +26,21 @@ You can install this package with the devtools package. The first time you do it
 install.packages("devtools")
 library(devtools)
 ```
-
-Then, you can run 
+Then run:
 ```r 
 devtools::install_github("Seafood-Globalization-Lab/exploreARTIS@v1.0.0", dependencies = TRUE)
-# @v1.0.0 indicates the released version of the package. 
+# @v1.0.0 indicates the released version of the package.
+library(exploreARTIS)
 ```
 
-After you install the exploreARTIS package, you can just load it with `library(exploreARTIS)`. You will also need to reinstall the package whenever there are updates to the package code.
+To install the latest development version of the package (pre-release):
+```
+devtools::install_github("Seafood-Globalization-Lab/exploreARTIS@develop", dependencies = TRUE)
+# @develop indicates the develop branch where the maintainers stage package improvements and new features for the next version release
+library(exploreARTIS)
+```
+
+You will need to reinstall the package from Github if you want to get updates to the package code.
 
 ## ARTIS data structure
 
