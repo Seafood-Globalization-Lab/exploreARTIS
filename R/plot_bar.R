@@ -209,9 +209,23 @@ plot_bar <- function(data,
       tidytext::scale_y_reordered()
   }
   
-  p <- p +
-    labs(y = y.lab, x = x.lab, fill = fill.lab) +
-    theme_bw()
+  # add title, axis labels, and fill legend
+  if (plot.title != "") {
+    p <- p + labs(
+      title = plot.title,
+      y     = y.lab,
+      x     = x.lab,
+      fill  = fill.lab
+    )
+  } else {
+    p <- p + labs(
+      y    = y.lab,
+      x    = x.lab,
+      fill = fill.lab
+    )
+  }
+
+  p <- p + theme_bw()
 
   return(p)
-}
+  }
